@@ -13,7 +13,7 @@
         </div>
 
         <!-- 文章列表 -->
-        <div class="center" v-show="!is_detail">
+        <div class="center" v-if="!is_detail">
             <el-card class="card menu2">
                 <!-- <h3>文章分类</h3> -->
                 <el-radio-group v-model="radio1">
@@ -47,7 +47,7 @@
         </div>
 
         <!-- 热门文章/标签/友链 -->
-        <div class="aside" v-show="!is_detail">
+        <div class="aside" v-if="!is_detail">
             <el-card class="card">
                 <h3>热门文章 <fire theme="outline" size="16" fill="#ee8f8f" /></h3>
                 <ul class="hot-article">
@@ -73,7 +73,7 @@
         </div>
 
         <!-- 文章详情 -->
-        <div class="center" v-show="is_detail">
+        <div class="center" v-if="is_detail">
             <el-card class="card detail">
                 <el-page-header @back="goBack" :icon="ArrowLeft" content="detail" />
             </el-card>
@@ -106,15 +106,17 @@ import MdEditor from "md-editor-v3"
 import "md-editor-v3/lib/style.css"
 import Comments from "@C/Comments.vue"
 import { getArticle, getTags, getFriendLink } from "../api/blog"
+import { ArticleClass } from "../type/article.type"
 
 const route = useRoute()
 const router = useRouter()
 
 // 获取分类总览
-const menu_list = reactive([])
-getArticle("/getClassification").then(res => {
-    menu_list.push(...res.data)
+let menu_list = ref<ArticleClass[]>([])
+getArticle("/getArticleClass").then((res: any) => {
+    menu_list.value = res
 })
+
 // 判断当前分类
 const current_class = computed(() => {
     return route.query.current_class || "all"
@@ -128,13 +130,13 @@ getArticle("/getListData", {
     current_page: 1,
     page_size: 5,
 }).then(res => {
-    hot_article.push(...res.data)
+    // hot_article.push(...res.data)
 })
 
 // 获取所有标签
 const tag_list = reactive([])
 getTags("/getAllTags").then(res => {
-    tag_list.push(...res.data)
+    // tag_list.push(...res.data)
 })
 
 // 控制点击标签高亮
@@ -146,18 +148,18 @@ const checkedTag = (name: string) => {
 // 获取友链
 const friend_list = reactive([])
 getFriendLink("/getAllLink").then(res => {
-    friend_list.push(...res.data)
+    // friend_list.push(...res.data)
 })
 
 // 获取当前分类文章列表
 const article_list = reactive([])
-getArticle("/getListData", {
+getArticle("/getArticleList", {
     type: current_class.value,
     sort: "",
     current_page: 1,
-    page_size: 6,
+    page_size: 5,
 }).then(res => {
-    article_list.push(...res.data)
+    // article_list.push(...res.list)
 })
 
 const is_detail = ref(false)
@@ -171,9 +173,9 @@ const checkDetail = () => {
     getArticle("/getDetail", {
         id: 1,
     }).then(res => {
-        htmltext.value = res.data.html
-        comment_total.value = res.data.comment_total
-        comment_data.push(...res.data.comment_data)
+        // htmltext.value = res.data.html
+        // comment_total.value = res.data.comment_total
+        // comment_data.push(...res.data.comment_data)
         is_detail.value = true
     })
 }
