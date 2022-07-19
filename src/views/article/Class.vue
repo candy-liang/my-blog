@@ -1,19 +1,21 @@
 <template>
-    <el-card>
-        <div class="btn">
-            <el-button @click="add_class_dialog = true" type="primary">新增</el-button>
-            <el-button @click="deleteClass" type="danger">删除</el-button>
-        </div>
-        <el-table :data="tableData" border @selection-change="handleSelect">
-            <el-table-column type="selection" width="55" align="center" />
-            <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="name" label="名称" align="center" />
-            <el-table-column prop="type" label="类型" width="180" align="center" />
-            <el-table-column prop="count" label="拥有文章数" width="180" align="center" />
-            <el-table-column prop="createdAt" label="创建时间" width="180" align="center" />
-            <el-table-column prop="updatedAt" label="更新时间" width="180" align="center" />
-        </el-table>
-    </el-card>
+    <div class="btn">
+        <el-button @click="add_class_dialog = true" type="primary">新增</el-button>
+        <el-button @click="deleteClass" type="danger">删除</el-button>
+    </div>
+    <el-table :data="tableData" border @selection-change="handleSelect">
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column prop="id" label="id" width="60" align="center" />
+        <el-table-column prop="name" label="名称" align="center" sortable>
+            <template #default="scope">
+                <span class="class-name" @click="gotoClass(scope.row.type)" title="点击跳转对应分类">{{ scope.row.name }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="type" label="类型" width="180" align="center" sortable />
+        <el-table-column prop="count" label="拥有文章数" width="180" align="center" sortable />
+        <el-table-column prop="createdAt" label="创建时间" width="180" align="center" sortable />
+        <el-table-column prop="updatedAt" label="更新时间" width="180" align="center" sortable />
+    </el-table>
     <el-dialog v-model="add_class_dialog" title="新增文章分类" width="30%" center>
         <el-form>
             <el-form-item label="分类名称">
@@ -38,7 +40,7 @@ import { getArticle } from "../../api/blog";
 import { ArticleClass } from "../../type/article.type"
 const loading = ref(false)
 const add_class_dialog = ref(false)
-
+const router = useRouter()
 let tableData = ref<ArticleClass[]>([])
 const getTableData = () => {
     loading.value = true
@@ -94,6 +96,14 @@ const table_selected = ref([])
 const handleSelect = (val: any) => {
     table_selected.value = val
 }
+const gotoClass = (type: string) => {
+    router.push({
+        name: 'blog',
+        query: {
+            current_class: type
+        }
+    })
+}
 
 </script>
               
@@ -101,5 +111,14 @@ const handleSelect = (val: any) => {
 <style lang="scss" scoped>
 .btn {
     margin-bottom: 20px;
+}
+
+.class-name {
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+        color: #409EFF
+    }
 }
 </style>

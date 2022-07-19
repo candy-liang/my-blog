@@ -1,10 +1,8 @@
 <template>
     <div class="menu">
         <el-card class="card">
-            <!-- <h3>文章分类</h3> -->
-            <el-radio-group v-model="radio1">
-                <el-radio-button v-for="item in menu_list" :label="item.name">{{ item.name }}</el-radio-button>
-                <el-button type="primary" class="ml10" :icon="Plus" title="新增分类" circle />
+            <el-radio-group v-model="current_class" @change="getArticleList">
+                <el-radio-button v-for="item in menu_list" :label="item.type">{{ item.name }}</el-radio-button>
             </el-radio-group>
         </el-card>
     </div>
@@ -82,6 +80,8 @@ import { ArticleClass } from "../type/article.type"
 
 const route = useRoute()
 const router = useRouter()
+const current_class = ref("all")
+current_class.value = route.query.current_class as string || 'all'
 
 // 获取分类总览
 let menu_list = ref<ArticleClass[]>([])
@@ -89,10 +89,7 @@ getArticle("/getArticleClass").then((res: any) => {
     menu_list.value = res
 })
 
-// 判断当前分类
-const current_class = computed(() => {
-    return route.query.current_class || "all"
-})
+
 
 // 获取热门文章
 const hot_article = ref<any[]>([])
@@ -125,14 +122,17 @@ getFriendLink("/getAllLink").then((res: any) => {
 
 // 获取当前分类文章列表
 const article_list = ref<any[]>([])
-getArticle("/getArticleList", {
-    type: current_class.value,
-    sort: "",
-    current_page: 1,
-    page_size: 4,
-}).then((res: any) => {
-    article_list.value = res.list
-})
+const getArticleList = () => {
+    getArticle("/getArticleList", {
+        type: current_class.value,
+        sort: "",
+        current_page: 1,
+        page_size: 6,
+    }).then((res: any) => {
+        article_list.value = res.list
+    })
+}
+getArticleList()
 
 const is_detail = ref(false)
 
@@ -151,7 +151,6 @@ const checkDetail = () => {
     // })
 }
 
-const radio1 = ref("全部分类")
 
 
 </script>
@@ -169,15 +168,16 @@ const radio1 = ref("全部分类")
 }
 
 
+.menu {
+    width: 80%;
+    margin: 0 auto;
+}
 
 .blog {
     display: flex;
+    width: 80%;
+    margin: 0 auto;
 }
-
-
-
-
-
 
 .center {
     flex: 1;

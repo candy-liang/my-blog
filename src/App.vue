@@ -1,7 +1,9 @@
 <template>
     <Header />
     <div class="main">
-        <router-view></router-view>
+        <el-config-provider :locale="zhCn">
+            <router-view></router-view>
+        </el-config-provider>
     </div>
     <el-backtop :bottom="100" :visibility-height="50"></el-backtop>
     <Footer />
@@ -10,7 +12,8 @@
 <script setup lang="ts">
 import Header from "@C/Header.vue"
 import Footer from "@C/Footer.vue"
-
+import { ElConfigProvider } from 'element-plus'
+import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 </script>
 
 <style lang="scss" scoped>
@@ -20,17 +23,14 @@ import Footer from "@C/Footer.vue"
     top: 70px;
     padding: 20px;
     height: calc(100vh - 120px);
-    overflow-y: auto;
+    overflow-y: overlay;
     overflow-x: hidden;
     box-sizing: border-box;
+    background-color: #fafafa;
 }
 </style>
 <style lang="scss">
 @import "/style/reset.css";
-
-#app {
-    background-color: #f1f0f0;
-}
 
 .app {
     background: url("@/assets/poster.jpeg");
