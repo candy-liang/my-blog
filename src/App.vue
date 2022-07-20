@@ -1,12 +1,12 @@
 <template>
-    <Header />
-    <div class="main">
-        <el-config-provider :locale="zhCn">
+    <el-config-provider :locale="zhCn">
+        <Header />
+        <div class="main">
             <router-view></router-view>
-        </el-config-provider>
-    </div>
-    <el-backtop :bottom="100" :visibility-height="50"></el-backtop>
-    <Footer />
+        </div>
+        <el-backtop :bottom="100" :visibility-height="50"></el-backtop>
+        <Footer />
+    </el-config-provider>
 </template>
 
 <script setup lang="ts">

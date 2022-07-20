@@ -33,13 +33,13 @@ export default defineConfig({
     // 设置代理，根据我们项目实际情况配置
     proxy: {
       '/dev': {
-        target: 'http://192.168.32.91:8000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace('/dev', '')
       },
       '/mock': {
-        target: 'http://127.0.0.1:4523/mock/1150240',
+        target: 'http://42.194.209.27:8000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace('/mock', '')

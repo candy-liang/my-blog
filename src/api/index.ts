@@ -3,7 +3,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 const config = {
-    baseURL: import.meta.env.VITE_HOST,
+    baseURL: import.meta.env.VITE_MOCK,
     timeout: 10 * 1000,
     withCredentials: true
 };
