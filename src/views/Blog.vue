@@ -10,7 +10,7 @@
         <!-- 文章列表 -->
         <div class="center" v-if="!is_detail">
             <ul>
-                <li v-for="item in article_list" @click="checkDetail">
+                <li v-for="item in article_list" @click="checkArticle(item.id)">
                     <el-card class="card list">
                         <h3>{{ item.title }}</h3>
                         <div class="description">
@@ -27,7 +27,7 @@
                             <preview-open theme="outline" size="20" />
                             <span class="item">{{ item.view_count }}</span>
                             <calendar theme="outline" size="18" />
-                            <span class="item">{{ item.create_time }}</span>
+                            <span class="item">{{ item.createdAt }}</span>
                         </div>
                     </el-card>
                 </li>
@@ -37,26 +37,14 @@
         <!-- 热门文章/标签/友链 -->
         <div class="aside" v-if="!is_detail">
             <el-card class="card">
-                <h3>热门文章
-                    <fire theme="outline" size="16" fill="#ee8f8f" />
-                </h3>
+                <h3>热门文章</h3>
                 <ul class="hot-article">
-                    <li v-for="(item, index) in hot_article">{{ `${index + 1}、${item.title}` }}</li>
+                    <li v-for="item in hot_article" @click="checkArticle(item.id)">{{ item.title }}</li>
                 </ul>
             </el-card>
+
             <el-card class="card">
-                <h3>热门标签
-                    <tag theme="outline" size="16" fill="#f0a01c" />
-                </h3>
-                <div class="tag-list">
-                    <el-check-tag v-for="(item, index) in tag_list" :checked="item.name == current_tag" type="info"
-                        @change="checkedTag(item.name)">{{ item.name }}</el-check-tag>
-                </div>
-            </el-card>
-            <el-card class="card">
-                <h3>友链
-                    <link-two theme="outline" size="16" fill="#4a90e2" />
-                </h3>
+                <h3>友链</h3>
                 <div class="friend-link" v-for="item in friend_list">
                     <el-avatar shape="square" :size="40" :src="item.avatar" />
                     <div class="name">
@@ -93,32 +81,28 @@ getArticle("/getArticleClass").then((res: any) => {
 
 // 获取热门文章
 const hot_article = ref<any[]>([])
-getArticle("/getListData", {
-    type: "all",
-    sort: "hot",
-    current_page: 1,
-    page_size: 5,
-}).then((res: any) => {
-    hot_article.value = res.data
+getArticle("/getHotArticleList").then((res: any) => {
+    hot_article.value = res
 })
-
-// 获取所有标签
-const tag_list = ref<any[]>([])
-getTags("/getAllTags").then((res: any) => {
-    tag_list.value = res.data
-})
-
-// 控制点击标签高亮
-const current_tag = ref("")
-const checkedTag = (name: string) => {
-    current_tag.value = name
-}
 
 // 获取友链
-const friend_list = ref<any[]>([])
-getFriendLink("/getAllLink").then((res: any) => {
-    friend_list.value = res.data
-})
+const friend_list = ref<any[]>([
+    {
+        name: 'nice佬',
+        motto: '斗宗强者，恐怖如斯',
+        avatar: 'https://xiaolongosscdn.liam0418.com/navigation/images/nice.ico',
+        link: 'https://xiaojiju.com/',
+    },
+    {
+        name: '浪里小白龙',
+        motto: '斗宗强者，恐怖如斯',
+        avatar: 'https://xiaolong-oss-cdn.oss-cn-guangzhou.aliyuncs.com/myblog/images/logo.jpg',
+        link: 'https://blog.xiaolong0418.com/links',
+    },
+])
+// getFriendLink("/getAllLink").then((res: any) => {
+//     friend_list.value = res.data
+// })
 
 // 获取当前分类文章列表
 const article_list = ref<any[]>([])
@@ -139,16 +123,14 @@ const is_detail = ref(false)
 
 // 获取文章详情
 
-const checkDetail = () => {
-    router.push({ name: 'detail' })
-    // getArticle("/getDetail", {
-    //     id: 1,
-    // }).then((res: any) => {
-    //     htmltext.value = res.data.html
-    //     comment_total.value = res.data.comment_total
-    //     comment_data.push(...res.data.comment_data)
-    //     is_detail.value = true
-    // })
+
+const checkArticle = (id: number) => {
+    router.push({
+        name: 'detail',
+        query: {
+            id: id
+        }
+    })
 }
 
 
@@ -230,12 +212,6 @@ const checkDetail = () => {
             }
         }
     }
-
-    .detail {
-        margin-bottom: 10px;
-    }
-
-
 }
 
 .pagination {
@@ -251,9 +227,17 @@ const checkDetail = () => {
 .aside {
     margin-left: 20px;
 
+    h3 {
+        font-weight: normal;
+    }
+
     .hot-article {
         font-size: 14px;
         color: #666;
+
+        li {
+            padding: 0 5px;
+        }
     }
 
     .tag-list {

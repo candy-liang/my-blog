@@ -1,5 +1,5 @@
 export interface ArticleClass {
-    id: number
+    id: number | string
     count: number
     name: string
     type: string

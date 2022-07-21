@@ -4,7 +4,7 @@
         <el-button @click="deleteClass" type="danger">删除</el-button>
     </div>
     <el-table :data="tableData" border @selection-change="handleSelect">
-        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column prop="id" label="id" width="60" align="center" />
         <el-table-column prop="name" label="名称" align="center" sortable>
             <template #default="scope">
@@ -104,13 +104,16 @@ const gotoClass = (type: string) => {
         }
     })
 }
-
+const selectable = (row: any, index: number) => {
+    return row.type != 'all'
+}
 </script>
               
               
 <style lang="scss" scoped>
 .btn {
     margin-bottom: 20px;
+    line-height: 33px;
 }
 
 .class-name {

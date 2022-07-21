@@ -20,7 +20,6 @@ const props = defineProps({
     background-color: rgba(255, 255, 255, 0.8);
     color: #333;
     position: absolute;
-    border-top: 1px solid #999;
     bottom: 0;
 }
 

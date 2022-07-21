@@ -9,7 +9,9 @@
                 <el-tab-pane label="我的文章" name="article" lazy>
                     <List />
                 </el-tab-pane>
-                <el-tab-pane label="博客总览" name="view" lazy>博客总览</el-tab-pane>
+                <el-tab-pane label="友链管理" name="friend" lazy>
+                    <Friend />
+                </el-tab-pane>
             </el-tabs>
         </div>
     </el-card>
@@ -19,6 +21,7 @@
 <script setup lang="ts">
 import Class from "./article/Class.vue";
 import List from "./article/List.vue";
+import Friend from "./friend/index.vue";
 import type { TabsPaneContext } from 'element-plus'
 const router = useRouter()
 const route = useRoute()

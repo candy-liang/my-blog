@@ -7,6 +7,7 @@
                 </el-icon>返回
             </el-button>
             <span class="title">{{ detail.title }}{{ previewOnly ? ' (编辑中...)' : '' }}</span>
+
             <div class="btn">
                 <el-button type="primary" @click="previewOnly = !previewOnly">{{ previewOnly ? '完成' : '编辑' }}
                 </el-button>
@@ -15,7 +16,7 @@
         </div>
     </el-card>
     <div id="detail">
-        <div class="aside" v-if="!previewOnly && catalogList.length">
+        <div class="aside" v-if="!previewOnly">
             <el-card class="card">
                 <h3>目录</h3>
                 <ul>
@@ -28,17 +29,15 @@
         <!-- 文章详情 -->
         <div class="center">
             <el-card class="card detail">
-                <md-editor editorId="my-editor" v-model="text" v-if="previewOnly" :preview="true" code-theme="atoms"
+                <md-editor editorId="my-editor" v-model="text" v-show="previewOnly" :preview="false" code-theme="atoms"
                     @onHtmlChanged="saveHtml" @onGetCatalog="onGetCatalog" style="height:600px" />
-                <div v-else class="default-theme" ref="artContent" v-html="htmltext"></div>
+                <div v-show="!previewOnly" class="default-theme" ref="artContent" v-html="htmltext"></div>
 
             </el-card>
             <el-card class="card">
                 <Comments :data="comment_data" :total="comment_total"></Comments>
             </el-card>
-
         </div>
-
     </div>
 </template>
               
@@ -61,7 +60,6 @@ const detail = ref<any>({})
 const catalogList = ref<any>([])
 const onGetCatalog = (list: []) => {
     catalogList.value = list
-    console.log(list);
 }
 
 const getDetail = () => {
@@ -70,7 +68,6 @@ const getDetail = () => {
     }).then((res: any) => {
         detail.value = res
         htmltext.value = res.md_html || ''
-        catalogList.value = res.catalogList
         text.value = res.text
     })
 }
@@ -78,7 +75,6 @@ const getDetail = () => {
 const submit = () => {
     getArticle("/updateArticleDetail", {
         id: id,
-        catalogList: catalogList.value,
         md_html: htmltext.value,
         text: text.value,
     }).then((res: any) => {
@@ -102,10 +98,6 @@ MdEditor.config({
     },
 })
 
-
-
-
-
 const saveHtml = (h: string) => {
     htmltext.value = h
 }
@@ -113,6 +105,7 @@ const goBack = () => {
     router.go(-1)
 }
 const goAnchor = (selector: any) => {
+    console.log(document.getElementById(selector));
     document.getElementById(selector)?.scrollIntoView({ block: "start", inline: "center", behavior: "smooth" })
 }
 </script>

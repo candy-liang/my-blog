@@ -2,10 +2,8 @@
     <div class="btn">
         <el-button @click="addArticle('add')" type="primary">新增</el-button>
         <el-button @click="deleteArticle" type="danger">删除</el-button>
-        <el-select v-model="cur_class" @change="getTableData" style="margin-left: 15px;">
-            <el-option v-for="item in class_list" :key="item.type" :label="item.name" :value="item.type" />
-        </el-select>
-        <el-input v-model="search_val" class="search_bar" placeholder="请输入文章标题">
+
+        <el-input v-model="search_val" class="search_bar" placeholder="请输入友链名称">
             <template #append>
                 <el-button @click="searchHandle" :icon="Search" />
             </template>
@@ -14,11 +12,11 @@
     <el-table :data="table_data" v-loading="loading" border @selection-change="handleSelect">
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="id" label="id" align="center" width="60" />
-        <el-table-column prop="title" label="标题" align="center" sortable></el-table-column>
-        <el-table-column prop="type" label="类型" align="center" sortable />
-        <el-table-column prop="description" label="描述" align="center" />
-        <el-table-column prop="id" label="评论数" align="center" width="100" sortable />
-        <el-table-column prop="view_count" label="浏览数" align="center" width="100" sortable />
+        <el-table-column prop="title" label="logo" align="center" sortable></el-table-column>
+        <el-table-column prop="type" label="名称" align="center" sortable />
+        <el-table-column prop="description" label="状态" align="center" />
+        <el-table-column prop="id" label="简介" align="center" width="100" sortable />
+        <el-table-column prop="view_count" label="地址" align="center" width="100" sortable />
         <el-table-column prop="createdAt" label="创建时间" align="center" sortable />
         <el-table-column prop="updatedAt" label="更新时间" align="center" sortable />
         <el-table-column label="操作" align="center" sortable>
@@ -34,17 +32,17 @@
 
     <el-dialog v-model="add_article_dialog" :title="dialog_type == 'edit' ? '编辑文章简要' : '新增文章'" width="500px " center>
         <el-form>
-            <el-form-item label="文章标题">
+            <el-form-item label="友链名称">
                 <el-input v-model="new_article.title" />
             </el-form-item>
-            <el-form-item label="所属分类">
-                <el-select v-model="new_article.type" style="width:100%">
-                    <el-option v-for="item in class_list" :key="item.type" :label="item.name" :value="item.type"
-                        v-show="item.type != 'all'" />
-                </el-select>
+            <el-form-item label="logo地址">
+                <el-input v-model="new_article.type" />
             </el-form-item>
-            <el-form-item label="文章描述">
-                <el-input v-model="new_article.description" autosize type="textarea" />
+            <el-form-item label="友链地址">
+                <el-input v-model="new_article.type" />
+            </el-form-item>
+            <el-form-item label="简介描述">
+                <el-input v-model="new_article.description" />
             </el-form-item>
         </el-form>
         <template #footer>
