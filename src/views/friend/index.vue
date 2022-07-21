@@ -11,15 +11,13 @@
     </div>
     <el-table :data="table_data" v-loading="loading" border @selection-change="handleSelect">
         <el-table-column type="selection" align="center" width="55" />
-        <el-table-column prop="id" label="id" align="center" width="60" />
-        <el-table-column prop="title" label="logo" align="center" sortable></el-table-column>
-        <el-table-column prop="type" label="名称" align="center" sortable />
-        <el-table-column prop="description" label="状态" align="center" />
-        <el-table-column prop="id" label="简介" align="center" width="100" sortable />
-        <el-table-column prop="view_count" label="地址" align="center" width="100" sortable />
-        <el-table-column prop="createdAt" label="创建时间" align="center" sortable />
-        <el-table-column prop="updatedAt" label="更新时间" align="center" sortable />
-        <el-table-column label="操作" align="center" sortable>
+        <el-table-column prop="title" label="logo" align="center" width="100"></el-table-column>
+        <el-table-column prop="type" label="名称" align="center" />
+        <el-table-column prop="description" label="状态" align="center" width="100" />
+        <el-table-column prop="id" label="简介" align="center" />
+        <el-table-column prop="view_count" label="地址" align="center" width="100" />
+        <el-table-column prop="createdAt" label="创建时间" align="center" />
+        <el-table-column label="操作" align="center" width="140">
             <template #default="scope">
                 <el-button @click="addArticle('edit', scope.row)" size="small">编辑</el-button>
                 <el-button @click="checkArticle(scope.row.id)" size="small" type="primary" plain>查看</el-button>

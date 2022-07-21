@@ -5,16 +5,15 @@
     </div>
     <el-table :data="tableData" border @selection-change="handleSelect">
         <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
-        <el-table-column prop="id" label="id" width="60" align="center" />
-        <el-table-column prop="name" label="名称" align="center" sortable>
+        <el-table-column prop="name" label="名称" align="center">
             <template #default="scope">
                 <span class="class-name" @click="gotoClass(scope.row.type)" title="点击跳转对应分类">{{ scope.row.name }}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="180" align="center" sortable />
-        <el-table-column prop="count" label="拥有文章数" width="180" align="center" sortable />
-        <el-table-column prop="createdAt" label="创建时间" width="180" align="center" sortable />
-        <el-table-column prop="updatedAt" label="更新时间" width="180" align="center" sortable />
+        <el-table-column prop="type" label="类型" align="center" />
+        <el-table-column prop="count" label="拥有文章数" width="180" align="center" />
+        <el-table-column prop="createdAt" label="创建时间" width="180" align="center" />
+        <el-table-column prop="updatedAt" label="更新时间" width="180" align="center" />
     </el-table>
     <el-dialog v-model="add_class_dialog" title="新增文章分类" width="30%" center>
         <el-form>
