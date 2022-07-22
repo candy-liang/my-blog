@@ -31,7 +31,11 @@ activeName.value = route.query.activeName as string || 'class'
 const handleClick = (tab: TabsPaneContext) => {
     router.push({
         name: "admin",
-        query: { activeName: tab.paneName }
+        query: {
+            activeName: tab.paneName,
+            current_page: 1,
+            page_size: 10
+        }
     })
 
 }
@@ -41,7 +45,6 @@ const handleClick = (tab: TabsPaneContext) => {
 <style lang="scss" scoped>
 .admin {
 
-    // min-height: 500px;
     :deep(.el-tabs__header) {
         margin-right: 20px;
     }

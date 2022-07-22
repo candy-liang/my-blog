@@ -105,7 +105,6 @@ const goBack = () => {
     router.go(-1)
 }
 const goAnchor = (selector: any) => {
-    console.log(document.getElementById(selector));
     document.getElementById(selector)?.scrollIntoView({ block: "start", inline: "center", behavior: "smooth" })
 }
 </script>

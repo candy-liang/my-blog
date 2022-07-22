@@ -27,9 +27,9 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-pagination v-model:currentPage="current_page" v-model:page-size="page_size" class="pagination"
-        :page-sizes="[10, 20, 50, 100]" background layout="total,sizes,prev,pager,next" :total="total"
-        @size-change="getTableData" @current-change="getTableData" />
+    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[10, 20, 50, 100]"
+        background layout="total,sizes,prev,pager,next" :total="total" @size-change="sizeChange"
+        @current-change="currentChange" />
 
     <el-dialog v-model="add_article_dialog" :title="dialog_type == 'edit' ? '编辑文章简要' : '新增文章'" width="500px " center>
         <el-form>
@@ -59,7 +59,8 @@
 <script setup lang="ts">
 import { getArticle } from "../../api/blog";
 import { ArticleClass } from "../../type/article.type"
-import { Search, Edit, View } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
+const route = useRoute()
 const router = useRouter()
 const dialog_type = ref('')
 const cur_id = ref(0)
@@ -109,8 +110,18 @@ const page_size = ref(10)   //每页数
 const total = ref(0)    //文章总数
 const table_data = ref<any[]>([])   //列表数据
 const loading = ref(false)  //列表loading
+current_page.value = Number(route.query.current_page as string) || 1
+page_size.value = Number(route.query.page_size as string) || 10
 const getTableData = () => {
     loading.value = true
+    router.push({
+        name: 'admin',
+        query: {
+            activeName: route.query.activeName,
+            current_page: current_page.value,
+            page_size: page_size.value
+        }
+    })
     getArticle("/getArticleList", {
         type: cur_class.value,
         current_page: current_page.value,
@@ -163,6 +174,14 @@ const checkArticle = (id: number) => {
             id: id
         }
     })
+}
+const sizeChange = (val: number) => {
+    page_size.value = val
+    getTableData()
+}
+const currentChange = (val: number) => {
+    current_page.value = val
+    getTableData()
 }
 </script>
               

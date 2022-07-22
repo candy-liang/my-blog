@@ -8,8 +8,8 @@
     </div>
     <div class="blog">
         <!-- 文章列表 -->
-        <div class="center" v-if="!is_detail">
-            <ul>
+        <div class="center">
+            <ul v-loading="loading">
                 <li v-for="item in article_list" @click="checkArticle(item.id)">
                     <el-card class="card list">
                         <h3>{{ item.title }}</h3>
@@ -35,7 +35,7 @@
         </div>
 
         <!-- 热门文章/标签/友链 -->
-        <div class="aside" v-if="!is_detail">
+        <div class="aside">
             <el-card class="card">
                 <h3>热门文章</h3>
                 <ul class="hot-article">
@@ -44,28 +44,56 @@
             </el-card>
 
             <el-card class="card">
-                <h3>友链</h3>
-                <div class="friend-link" v-for="item in friend_list">
-                    <el-avatar shape="square" :size="40" :src="item.avatar" />
+                <h3>友链
+                    <el-button :icon="Plus" @click="applyFriendLink" title="申请添加友链" class="ml10" circle size="small" />
+                </h3>
+                <div class="friend-link" v-for="item in friend_list" @click="linkTo(item.link)"
+                    :title="item.introduction" v-show="item.status == 'show'">
+                    <el-avatar :src="item.logo">
+                        <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+                    </el-avatar>
                     <div class="name">
                         <h4>{{ item.name }}</h4>
-                        <p>—{{ item.motto }}</p>
+                        <p>—{{ item.introduction }}</p>
                     </div>
                 </div>
             </el-card>
         </div>
 
     </div>
-    <el-pagination class="pagination" background layout="prev, pager,next" :total="1000" />
+    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[10, 20, 50, 100]"
+        background layout="total,prev,pager,next,sizes" :total="total" @size-change="sizeChange"
+        @current-change="currentChange" />
+
+    <el-dialog v-model="add_friend_link_dialog" title="填写友链信息" width="500px " center>
+        <el-form label-width="90px">
+            <el-form-item label="友链名称" required>
+                <el-input v-model="new_friendLink.name" />
+            </el-form-item>
+            <el-form-item label="logo地址" required>
+                <el-input v-model="new_friendLink.logo" />
+            </el-form-item>
+            <el-form-item label="友链地址" required>
+                <el-input v-model="new_friendLink.link" />
+            </el-form-item>
+            <el-form-item label="简介描述">
+                <el-input v-model="new_friendLink.introduction" autosize type="textarea" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button type="primary" @click="createFriendLink">确定</el-button>
+                <el-button @click="add_friend_link_dialog = false">取消</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { Comment, PreviewOpen, Calendar, Tag, Fire, LinkTwo } from "@icon-park/vue-next"
-import { Plus } from "@element-plus/icons-vue"
-
-import { getArticle, getTags, getFriendLink } from "../api/blog"
+import { Comment, PreviewOpen, Calendar } from "@icon-park/vue-next"
+import { getArticle, getFriendLink } from "../api/blog"
 import { ArticleClass } from "../type/article.type"
-
+import { Plus } from '@element-plus/icons-vue'
 const route = useRoute()
 const router = useRouter()
 const current_class = ref("all")
@@ -77,8 +105,6 @@ getArticle("/getArticleClass").then((res: any) => {
     menu_list.value = res
 })
 
-
-
 // 获取热门文章
 const hot_article = ref<any[]>([])
 getArticle("/getHotArticleList").then((res: any) => {
@@ -86,44 +112,56 @@ getArticle("/getHotArticleList").then((res: any) => {
 })
 
 // 获取友链
-const friend_list = ref<any[]>([
-    {
-        name: 'nice佬',
-        motto: '斗宗强者，恐怖如斯',
-        avatar: 'https://xiaolongosscdn.liam0418.com/navigation/images/nice.ico',
-        link: 'https://xiaojiju.com/',
-    },
-    {
-        name: '浪里小白龙',
-        motto: '斗宗强者，恐怖如斯',
-        avatar: 'https://xiaolong-oss-cdn.oss-cn-guangzhou.aliyuncs.com/myblog/images/logo.jpg',
-        link: 'https://blog.xiaolong0418.com/links',
-    },
-])
-// getFriendLink("/getAllLink").then((res: any) => {
-//     friend_list.value = res.data
-// })
+const friend_list = ref<any[]>([])
+getFriendLink("/getFriendLink").then((res: any) => {
+    friend_list.value = res.list
+})
 
 // 获取当前分类文章列表
 const article_list = ref<any[]>([])
+const loading = ref(false)  //列表loading
+const current_page = ref(1) //当前页码
+const page_size = ref(10)   //每页数
+const total = ref(0)    //文章总数
+current_page.value = Number(route.query.current_page as string) || 1
+page_size.value = Number(route.query.page_size as string) || 10
 const getArticleList = () => {
+    router.push({
+        name: 'blog',
+        query: {
+            current_class: current_class.value,
+            current_page: current_page.value,
+            page_size: page_size.value
+        }
+    })
     getArticle("/getArticleList", {
         type: current_class.value,
-        sort: "",
-        current_page: 1,
-        page_size: 6,
+        current_page: current_page.value,
+        page_size: page_size.value,
     }).then((res: any) => {
         article_list.value = res.list
+        total.value = res.total
+        loading.value = false
+    }).catch(e => {
+        loading.value = false
     })
 }
 getArticleList()
 
-const is_detail = ref(false)
+const sizeChange = (val: number) => {
+    page_size.value = val
+    getArticleList()
+}
+const currentChange = (val: number) => {
+    current_page.value = val
+    getArticleList()
+}
 
-
-// 获取文章详情
-
-
+// 友链跳转
+const linkTo = (link: string) => {
+    window.open(link, '_blank')
+}
+// 查看文章
 const checkArticle = (id: number) => {
     router.push({
         name: 'detail',
@@ -132,8 +170,28 @@ const checkArticle = (id: number) => {
         }
     })
 }
+const add_friend_link_dialog = ref(false)   //新增文章弹窗
+const new_friendLink = reactive({  //新增文章配置
+    name: "",
+    logo: "",
+    introduction: "",
+    link: "",
+})
+const applyFriendLink = () => {
+    add_friend_link_dialog.value = true
 
-
+}
+const createFriendLink = () => {
+    const { name, link, logo } = new_friendLink
+    if (!name || !link || !logo) {
+        ElMessage.warning('需填项均不能为空')
+        return
+    }
+    getFriendLink("/createFriendLink", { ...new_friendLink }).then((res: any) => {
+        ElMessage.success('已提交申请，请等待博主审核')
+        add_friend_link_dialog.value = false
+    })
+}
 
 </script>
 
@@ -146,6 +204,8 @@ const checkArticle = (id: number) => {
         padding-bottom: 10px;
         border-bottom: 1px solid #e7eaec;
         margin-bottom: 10px;
+        display: flex;
+        align-items: center;
     }
 }
 
@@ -248,7 +308,7 @@ const checkArticle = (id: number) => {
 
     .friend-link {
         display: flex;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         cursor: pointer;
 
         &:hover {
@@ -258,6 +318,7 @@ const checkArticle = (id: number) => {
         }
 
         .name {
+            flex: 1;
             margin-left: 10px;
             font-size: 14px;
             font-weight: bold;
@@ -279,21 +340,16 @@ const checkArticle = (id: number) => {
 }
 
 @media screen and (max-width: 1366px) {
-
     .aside {
         width: 240px;
         transition: all 0.5s;
     }
-
-
 }
 
 @media screen and (max-width: 1100px) {
     .aside {
         display: none;
     }
-
-
 }
 
 @media screen and (max-width: 1024px) {}

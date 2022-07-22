@@ -1,7 +1,7 @@
 <template>
     <div class="btn">
-        <el-button @click="addArticle('add')" type="primary">新增</el-button>
-        <el-button @click="deleteArticle" type="danger">删除</el-button>
+        <el-button @click="addFriendLink('add')" type="primary">新增</el-button>
+        <el-button @click="deleteFriendLink" type="danger">删除</el-button>
 
         <el-input v-model="search_val" class="search_bar" placeholder="请输入友链名称">
             <template #append>
@@ -11,16 +11,30 @@
     </div>
     <el-table :data="table_data" v-loading="loading" border @selection-change="handleSelect">
         <el-table-column type="selection" align="center" width="55" />
-        <el-table-column prop="title" label="logo" align="center" width="100"></el-table-column>
-        <el-table-column prop="type" label="名称" align="center" />
-        <el-table-column prop="description" label="状态" align="center" width="100" />
-        <el-table-column prop="id" label="简介" align="center" />
-        <el-table-column prop="view_count" label="地址" align="center" width="100" />
-        <el-table-column prop="createdAt" label="创建时间" align="center" />
+        <el-table-column prop="sort" label="排序权重" align="center" width="100" />
+        <el-table-column label="状态" align="center" width="100">
+            <template #default="scope">
+                <el-switch v-model="scope.row.status" @change="changeStatus(scope.row)" active-value="show"
+                    inactive-value="hide" />
+            </template>
+        </el-table-column>
+        <el-table-column label="logo" align="center" width="100">
+            <template #default="scope">
+                <el-avatar :src="scope.row.logo">
+                    <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+                </el-avatar>
+            </template>
+        </el-table-column>
+        <el-table-column prop="name" label="名称" align="center" width="160" />
+        <el-table-column prop="introduction" label="简介" align="center" />
+        <el-table-column label="地址" align="center">
+            <template #default="scope">
+                <a :href="scope.row.link" target="_blank">{{ scope.row.link }}</a>
+            </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="140">
             <template #default="scope">
-                <el-button @click="addArticle('edit', scope.row)" size="small">编辑</el-button>
-                <el-button @click="checkArticle(scope.row.id)" size="small" type="primary" plain>查看</el-button>
+                <el-button @click="addFriendLink('edit', scope.row)" size="small">编辑</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -28,25 +42,35 @@
         :page-sizes="[10, 20, 50, 100]" background layout="total,sizes,prev,pager,next" :total="total"
         @size-change="getTableData" @current-change="getTableData" />
 
-    <el-dialog v-model="add_article_dialog" :title="dialog_type == 'edit' ? '编辑文章简要' : '新增文章'" width="500px " center>
-        <el-form>
+    <el-dialog v-model="add_friend_link_dialog" :title="dialog_type == 'edit' ? '编辑友链信息' : '新增友链'" width="500px "
+        center>
+        <el-form label-width="80px">
             <el-form-item label="友链名称">
-                <el-input v-model="new_article.title" />
+                <el-input v-model="new_friendLink.name" />
             </el-form-item>
             <el-form-item label="logo地址">
-                <el-input v-model="new_article.type" />
+                <el-input v-model="new_friendLink.logo" />
             </el-form-item>
             <el-form-item label="友链地址">
-                <el-input v-model="new_article.type" />
+                <el-input v-model="new_friendLink.link" />
             </el-form-item>
             <el-form-item label="简介描述">
-                <el-input v-model="new_article.description" />
+                <el-input v-model="new_friendLink.introduction" autosize type="textarea" />
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-select v-model="new_friendLink.status" style="width:100%">
+                    <el-option label="不显示" value="hide" />
+                    <el-option label="显示" value="show" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="排序权重">
+                <el-input-number v-model="new_friendLink.sort" style="width:100%" :min="1" :max="100" />
             </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="createArticle">确定</el-button>
-                <el-button @click="add_article_dialog = false">取消</el-button>
+                <el-button type="primary" @click="createFriendLink">确定</el-button>
+                <el-button @click="add_friend_link_dialog = false">取消</el-button>
             </span>
         </template>
     </el-dialog>
@@ -54,47 +78,54 @@
               
               
 <script setup lang="ts">
-import { getArticle } from "../../api/blog";
-import { ArticleClass } from "../../type/article.type"
-import { Search, Edit, View } from '@element-plus/icons-vue'
+import { getFriendLink } from "../../api/blog";
+import { Search, UserFilled } from '@element-plus/icons-vue'
+const route = useRoute()
 const router = useRouter()
 const dialog_type = ref('')
 const cur_id = ref(0)
-const add_article_dialog = ref(false)   //新增文章弹窗
-const new_article = reactive({  //新增文章配置
-    title: "",
-    type: "",
-    description: "",
+const add_friend_link_dialog = ref(false)   //新增友链弹窗
+const new_friendLink = reactive({  //新增友链配置
+    name: "",
+    logo: "",
+    introduction: "",
+    link: "",
+    status: "",
+    sort: 1,
 })
-const addArticle = (type: string, row?: any) => {
+const addFriendLink = (type: string, row?: any) => {
     dialog_type.value = type
     if (type == 'edit') {
-        const { id, title, type, description } = row
+        const { id, name, logo, introduction, link, status, sort } = row
         cur_id.value = id
-        new_article.title = title
-        new_article.type = type
-        new_article.description = description
+        new_friendLink.name = name
+        new_friendLink.logo = logo
+        new_friendLink.introduction = introduction
+        new_friendLink.link = link
+        new_friendLink.status = status
+        new_friendLink.sort = sort
     } else {
-        new_article.title = ''
-        new_article.type = ''
-        new_article.description = ''
+        new_friendLink.name = ''
+        new_friendLink.logo = ''
+        new_friendLink.introduction = ''
+        new_friendLink.link = ''
+        new_friendLink.status = ''
+        new_friendLink.sort = 1
     }
-    add_article_dialog.value = true
+    add_friend_link_dialog.value = true
 }
-// -----------获取文章分类-----------------
-const cur_class = ref('all')    //当前分类
-const class_list = ref<ArticleClass[]>([])
-getArticle("/getArticleClass").then((res: any) => {
-    class_list.value = res
+const changeStatus = ((row: any) => {
+    getFriendLink("/createFriendLink", { id: row.id, status: row.status }).then((res: any) => {
+        ElMessage.success('修改显示状态成功')
+    })
 })
-// 创建文章/修改文章
-const createArticle = () => {
+// 创建友链/修改友链
+const createFriendLink = () => {
     const is_add = dialog_type.value == 'add'
-    let param = is_add ? { ...new_article } : { id: cur_id.value, ...new_article }
-    getArticle("/createArticle", param).then((res: any) => {
+    let param = is_add ? { ...new_friendLink } : { id: cur_id.value, ...new_friendLink }
+    getFriendLink("/createFriendLink", param).then((res: any) => {
         ElMessage.success(is_add ? '创建成功' : '修改成功')
-        add_article_dialog.value = false
-
+        add_friend_link_dialog.value = false
         getTableData()
     })
 }
@@ -103,13 +134,22 @@ const createArticle = () => {
 const search_val = ref('')  //搜索值
 const current_page = ref(1) //当前页码
 const page_size = ref(10)   //每页数
-const total = ref(0)    //文章总数
+const total = ref(0)    //友链总数
 const table_data = ref<any[]>([])   //列表数据
 const loading = ref(false)  //列表loading
+current_page.value = Number(route.query.current_page as string) || 1
+page_size.value = Number(route.query.page_size as string) || 10
 const getTableData = () => {
     loading.value = true
-    getArticle("/getArticleList", {
-        type: cur_class.value,
+    router.push({
+        name: 'admin',
+        query: {
+            activeName: route.query.activeName,
+            current_page: current_page.value,
+            page_size: page_size.value
+        }
+    })
+    getFriendLink("/getFriendLink", {
         current_page: current_page.value,
         page_size: page_size.value,
         key: search_val.value
@@ -123,15 +163,16 @@ const getTableData = () => {
 }
 getTableData()
 
-// 搜索文章
+// 搜索友链
 const searchHandle = () => {
     current_page.value = 1
     getTableData()
 }
-// 删除所选文章
-const deleteArticle = () => {
+
+// 删除所选友链
+const deleteFriendLink = () => {
     ElMessageBox.confirm(
-        `确定删除所选${table_selected.value.length}篇文章`,
+        `确定删除所选${table_selected.value.length}条友链`,
         '提示',
         {
             confirmButtonText: '确定',
@@ -139,7 +180,7 @@ const deleteArticle = () => {
             type: 'warning',
         }
     ).then(() => {
-        getArticle("/deleteArticle", {
+        getFriendLink("/deleteFriendLink", {
             id: table_selected.value.map((v: any) => v.id),
         }).then((res: any) => {
             ElMessage.success('删除成功')
@@ -152,15 +193,7 @@ const table_selected = ref([])  //列表勾选数据
 const handleSelect = (val: any) => {
     table_selected.value = val
 }
-// 查看文章
-const checkArticle = (id: number) => {
-    router.push({
-        name: 'detail',
-        query: {
-            id: id
-        }
-    })
-}
+
 </script>
               
               
