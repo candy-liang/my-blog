@@ -13,6 +13,7 @@
     </div>
     <el-table :data="table_data" v-loading="loading" border @selection-change="handleSelect">
         <el-table-column type="selection" align="center" width="55" />
+        <el-table-column prop="sort" label="排序权重" align="center" width="90" />
         <el-table-column prop="title" label="标题" align="center"></el-table-column>
         <el-table-column prop="type" label="类型" align="center" width="80" />
         <el-table-column prop="description" label="描述" align="center" />
@@ -45,6 +46,9 @@
             <el-form-item label="文章描述">
                 <el-input v-model="new_article.description" autosize type="textarea" />
             </el-form-item>
+            <el-form-item label="排序权重">
+                <el-input-number v-model="new_article.sort" style="width:100%" :min="1" :max="100" />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -69,19 +73,22 @@ const new_article = reactive({  //新增文章配置
     title: "",
     type: "",
     description: "",
+    sort: 1,
 })
 const addArticle = (type: string, row?: any) => {
     dialog_type.value = type
     if (type == 'edit') {
-        const { id, title, type, description } = row
+        const { id, title, type, description, sort } = row
         cur_id.value = id
         new_article.title = title
         new_article.type = type
         new_article.description = description
+        new_article.sort = sort
     } else {
         new_article.title = ''
         new_article.type = ''
         new_article.description = ''
+        new_article.sort = 1
     }
     add_article_dialog.value = true
 }
@@ -93,12 +100,15 @@ getArticle("/getArticleClass").then((res: any) => {
 })
 // 创建文章/修改文章
 const createArticle = () => {
+    if (!new_article.title || !new_article.type) {
+        ElMessage.warning('文章标题与所属分类都不能为空')
+        return
+    }
     const is_add = dialog_type.value == 'add'
     let param = is_add ? { ...new_article } : { id: cur_id.value, ...new_article }
     getArticle("/createArticle", param).then((res: any) => {
         ElMessage.success(is_add ? '创建成功' : '修改成功')
         add_article_dialog.value = false
-
         getTableData()
     })
 }
@@ -117,7 +127,7 @@ const getTableData = () => {
     router.push({
         name: 'admin',
         query: {
-            activeName: route.query.activeName,
+            active_name: route.query.active_name,
             current_page: current_page.value,
             page_size: page_size.value
         }
@@ -170,9 +180,7 @@ const handleSelect = (val: any) => {
 const checkArticle = (id: number) => {
     router.push({
         name: 'detail',
-        query: {
-            id: id
-        }
+        query: { id: id }
     })
 }
 const sizeChange = (val: number) => {

@@ -9,7 +9,7 @@
     <div class="blog">
         <!-- 文章列表 -->
         <div class="center">
-            <ul v-loading="loading">
+            <ul v-loading="loading" v-show="total > 0">
                 <li v-for="item in article_list" @click="checkArticle(item.id)">
                     <el-card class="card list">
                         <h3>{{ item.title }}</h3>
@@ -32,6 +32,7 @@
                     </el-card>
                 </li>
             </ul>
+            <el-empty v-show="total == 0" :image-size="200" description="暂无文章,请浏览其他分类" />
         </div>
 
         <!-- 热门文章/标签/友链 -->
@@ -41,6 +42,8 @@
                 <ul class="hot-article">
                     <li v-for="item in hot_article" @click="checkArticle(item.id)">{{ item.title }}</li>
                 </ul>
+                <el-empty v-show="hot_article.length == 0" :image-size="100" style="padding:10px 0"
+                    description="暂无文章" />
             </el-card>
 
             <el-card class="card">
@@ -57,13 +60,15 @@
                         <p>—{{ item.introduction }}</p>
                     </div>
                 </div>
+                <el-empty v-show="friend_list.length == 0" :image-size="100" style="padding:10px 0"
+                    description="暂无友链" />
             </el-card>
         </div>
 
     </div>
     <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[10, 20, 50, 100]"
         background layout="total,prev,pager,next,sizes" :total="total" @size-change="sizeChange"
-        @current-change="currentChange" />
+        @current-change="currentChange" v-show="total > 0" />
 
     <el-dialog v-model="add_friend_link_dialog" title="填写友链信息" width="500px " center>
         <el-form label-width="90px">
@@ -99,6 +104,7 @@ const router = useRouter()
 const current_class = ref("all")
 current_class.value = route.query.current_class as string || 'all'
 
+
 // 获取分类总览
 let menu_list = ref<ArticleClass[]>([])
 getArticle("/getArticleClass").then((res: any) => {
@@ -113,7 +119,7 @@ getArticle("/getHotArticleList").then((res: any) => {
 
 // 获取友链
 const friend_list = ref<any[]>([])
-getFriendLink("/getFriendLink").then((res: any) => {
+getFriendLink("/getFriendLink", { type: 'show' }).then((res: any) => {
     friend_list.value = res.list
 })
 
@@ -123,21 +129,27 @@ const loading = ref(false)  //列表loading
 const current_page = ref(1) //当前页码
 const page_size = ref(10)   //每页数
 const total = ref(0)    //文章总数
+const key = ref("")
+key.value = route.query.key as string || ''
 current_page.value = Number(route.query.current_page as string) || 1
 page_size.value = Number(route.query.page_size as string) || 10
-const getArticleList = () => {
+const reflashRouter = () => {
     router.push({
         name: 'blog',
         query: {
             current_class: current_class.value,
             current_page: current_page.value,
-            page_size: page_size.value
+            page_size: page_size.value,
+            key: key.value
         }
     })
+}
+const getArticleList = () => {
     getArticle("/getArticleList", {
         type: current_class.value,
         current_page: current_page.value,
         page_size: page_size.value,
+        key: key.value,
     }).then((res: any) => {
         article_list.value = res.list
         total.value = res.total
@@ -150,10 +162,12 @@ getArticleList()
 
 const sizeChange = (val: number) => {
     page_size.value = val
+    reflashRouter()
     getArticleList()
 }
 const currentChange = (val: number) => {
     current_page.value = val
+    reflashRouter()
     getArticleList()
 }
 
@@ -170,8 +184,8 @@ const checkArticle = (id: number) => {
         }
     })
 }
-const add_friend_link_dialog = ref(false)   //新增文章弹窗
-const new_friendLink = reactive({  //新增文章配置
+const add_friend_link_dialog = ref(false)   //申请友链弹窗
+const new_friendLink = reactive({  //申请友链配置
     name: "",
     logo: "",
     introduction: "",

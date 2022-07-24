@@ -16,7 +16,7 @@
         </div>
     </el-card>
     <div id="detail">
-        <div class="aside" v-if="!previewOnly">
+        <div class="aside" v-if="!previewOnly && catalogList.length > 0">
             <el-card class="card">
                 <h3>目录</h3>
                 <ul>
@@ -31,7 +31,9 @@
             <el-card class="card detail">
                 <md-editor editorId="my-editor" v-model="text" v-show="previewOnly" :preview="false" code-theme="atoms"
                     @onHtmlChanged="saveHtml" @onGetCatalog="onGetCatalog" style="height:600px" />
-                <div v-show="!previewOnly" class="default-theme" ref="artContent" v-html="htmltext"></div>
+                <div v-show="!previewOnly && htmltext" class="default-theme" ref="artContent" v-html="htmltext">
+                </div>
+                <el-empty v-show="!htmltext&&!previewOnly" :image-size="200" description="暂无文章内容,请浏览其他文章" />
 
             </el-card>
             <el-card class="card">
@@ -47,7 +49,6 @@ import MdEditor from "md-editor-v3"
 import "md-editor-v3/lib/style.css"
 import Comments from "@C/Comments.vue"
 import { getArticle } from "../api/blog";
-import { Message } from "@icon-park/vue-next";
 const router = useRouter()
 const route = useRoute()
 const previewOnly = ref(false)

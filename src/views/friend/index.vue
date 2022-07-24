@@ -57,7 +57,7 @@
             <el-form-item label="简介描述">
                 <el-input v-model="new_friendLink.introduction" autosize type="textarea" />
             </el-form-item>
-            <el-form-item label="状态">
+            <el-form-item label="激活状态">
                 <el-select v-model="new_friendLink.status" style="width:100%">
                     <el-option label="不显示" value="hide" />
                     <el-option label="显示" value="show" />
@@ -121,6 +121,11 @@ const changeStatus = ((row: any) => {
 })
 // 创建友链/修改友链
 const createFriendLink = () => {
+    const { name, link, logo } = new_friendLink
+    if (!name || !link || !logo) {
+        ElMessage.warning('友链名称、logo地址、友链地址、均不能为空')
+        return
+    }
     const is_add = dialog_type.value == 'add'
     let param = is_add ? { ...new_friendLink } : { id: cur_id.value, ...new_friendLink }
     getFriendLink("/createFriendLink", param).then((res: any) => {
@@ -144,7 +149,7 @@ const getTableData = () => {
     router.push({
         name: 'admin',
         query: {
-            activeName: route.query.activeName,
+            active_name: route.query.active_name,
             current_page: current_page.value,
             page_size: page_size.value
         }
