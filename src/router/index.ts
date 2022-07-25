@@ -4,22 +4,17 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'blog',
-    component: () => import('@/views/Blog.vue')
+    component: () => import('@/views/home/index.vue')
   },
   {
     path: '/admin',
     name: 'admin',
-    component: () => import('@/views/Admin.vue')
-  },
-  {
-    path: '/home',
-    name: 'home',
-    component: () => import('@/views/Home.vue')
+    component: () => import('@/views/admin/index.vue')
   },
   {
     path: '/detail',
     name: 'detail',
-    component: () => import('@/views/Detail.vue')
+    component: () => import('@/views/article/index.vue')
   },
   {
     path: '/about',

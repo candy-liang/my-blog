@@ -17,7 +17,8 @@
         <el-table-column prop="updatedAt" label="更新时间" width="180" align="center" />
         <el-table-column label="操作" align="center" width="140">
             <template #default="scope">
-                <el-button @click="addClass('edit', scope.row)" :disabled="scope.row.type=='all'" size="small">编辑</el-button>
+                <el-button @click="addClass('edit', scope.row)" :disabled="scope.row.type == 'all'" size="small">编辑
+                </el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -44,15 +45,15 @@
               
               
 <script setup lang="ts">
-import { getArticle } from "../../api/blog";
-import { ArticleClass } from "../../type/article.type"
+import { apiArticle } from "../../../api/blog";
+import { ArticleClass } from "../../../type/article.type"
 const loading = ref(false)
 const add_class_dialog = ref(false)
 const router = useRouter()
 let tableData = ref<ArticleClass[]>([])
 const getTableData = () => {
     loading.value = true
-    getArticle("/getArticleClass").then((res: any) => {
+    apiArticle("/getArticleClass").then((res: any) => {
         tableData.value = res
         loading.value = false
     }).catch(e => {
@@ -93,7 +94,7 @@ const addClassSure = () => {
     }
     const is_add = dialog_type.value == 'add'
     let param = is_add ? { ...new_class } : { id: cur_id.value, ...new_class }
-    getArticle("/createArticleClass", param).then((res: any) => {
+    apiArticle("/createArticleClass", param).then((res: any) => {
         getTableData()
         add_class_dialog.value = false
         ElMessage.success('添加成功')
@@ -111,7 +112,7 @@ const deleteClass = () => {
             type: 'warning',
         }
     ).then(() => {
-        getArticle("/deleteArticleClass", {
+        apiArticle("/deleteArticleClass", {
             type: table_selected.value.map((v: any) => v.type),
         }).then((res: any) => {
             ElMessage.success('删除成功')

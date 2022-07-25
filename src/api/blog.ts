@@ -1,9 +1,9 @@
 import { servicePost } from './index';
 
 
-export const getArticle = (url: string = '', data: any = {}) => servicePost("article" + url, data)
+export const apiArticle = (url: string = '', data: any = {}) => servicePost("article" + url, data)
 
-export const getTags = (url: string = '', data: any = {}) => servicePost("tags" + url, data)
+export const apiMessage = (url: string = '', data: any = {}) => servicePost("message" + url, data)
 
-export const getFriendLink = (url: string = '', data: any = {}) => servicePost("friendLink" + url, data)
+export const apiFriendLink = (url: string = '', data: any = {}) => servicePost("friendLink" + url, data)
 

@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <div class="logo" @click="backHome" title="返回首页">
+        <div class="logo" @click="skipRouter('blog')" title="返回首页">
             <img src="../assets/logohei.png" alt="" />
         </div>
         <div class="center">
@@ -11,32 +11,27 @@
             </el-input>
         </div>
         <div class="login">
-            <span v-for="item in menu" :class="{ active: route.name == item.path }" @click="enterRouter(item.path)">{{
+            <span v-for="item in menu" :class="{ active: route.name == item.path }" @click="skipRouter(item.path)">{{
                     item.label
             }}</span>
-            <span>登 录</span>
+            <!-- <span>登 录</span> -->
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { Search } from "@element-plus/icons-vue"
+import { updateQuery, skipRouter } from "../hooks/router.hook";
 const route = useRoute()
-const router = useRouter()
 const search_val = ref("")
-search_val.value = route.query.key as string || ''
-console.log(search_val.value,route.query.key);
-
-const backHome = () => {
-    router.push("/")
-}
-const enterRouter = (name: string) => {
-    router.push({ name: name })
-}
+watchEffect(() => {
+    search_val.value = route.query.key as string || ''
+})
+// 导航菜单
 const menu = reactive([
     {
-        label: '管理',
-        path: 'admin'
+        label: '首页',
+        path: 'blog'
     },
     {
         label: '关于',
@@ -46,14 +41,16 @@ const menu = reactive([
         label: '留言',
         path: 'message'
     },
+    {
+        label: '管理',
+        path: 'admin'
+    },
 ])
+// 处理搜索
 const searchArticle = () => {
-    router.push({
-        name: 'blog',
-        query: {
-            key: search_val.value
-        }
-    })
+    // 首页与非首页的参数不同
+    const param = route.name == 'blog' ? route : { name: 'blog' }
+    updateQuery(param, { key: search_val.value, current_page: 1 })
 }
 </script>
 

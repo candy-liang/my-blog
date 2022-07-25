@@ -78,7 +78,7 @@
               
               
 <script setup lang="ts">
-import { apiFriendLink } from "../../api/blog";
+import { apiFriendLink } from "../../../api/blog";
 import { Search } from '@element-plus/icons-vue'
 const route = useRoute()
 const router = useRouter()

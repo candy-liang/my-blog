@@ -1,14 +1,11 @@
 <template>
     <el-card class="card">
         <div class="header">
-            <el-button text @click="goBack">
-                <el-icon>
-                    <ArrowLeft />
-                </el-icon>返回
+            <el-button text @click="goBack" class="back">
+                <back theme="outline" size="24" fill="#999" title='返回' />
             </el-button>
             <span class="title">{{ detail.title }}{{ previewOnly ? ' (编辑中...)' : '' }}</span>
-
-            <div class="btn">
+            <div class="btn" v-if='is_admin'>
                 <el-button type="primary" @click="previewOnly = !previewOnly">{{ previewOnly ? '完成' : '编辑' }}
                 </el-button>
                 <el-button type="success" @click="submit">保存</el-button>
@@ -16,7 +13,7 @@
         </div>
     </el-card>
     <div id="detail">
-        <div class="aside" v-if="!previewOnly && catalogList.length > 0">
+        <div class="aside2" v-if="!previewOnly" :class="{ aside: catalogList.length > 0 }">
             <el-card class="card">
                 <h3>目录</h3>
                 <ul>
@@ -33,12 +30,12 @@
                     @onHtmlChanged="saveHtml" @onGetCatalog="onGetCatalog" style="height:600px" />
                 <div v-show="!previewOnly && htmltext" class="default-theme" ref="artContent" v-html="htmltext">
                 </div>
-                <el-empty v-show="!htmltext&&!previewOnly" :image-size="200" description="暂无文章内容,请浏览其他文章" />
+                <el-empty v-show="!htmltext && !previewOnly" :image-size="200" description="暂无文章内容，请浏览其他文章" />
 
             </el-card>
-            <el-card class="card">
+            <!-- <el-card class="card">
                 <Comments :data="comment_data" :total="comment_total"></Comments>
-            </el-card>
+            </el-card> -->
         </div>
     </div>
 </template>
@@ -47,10 +44,14 @@
 <script setup lang="ts">
 import MdEditor from "md-editor-v3"
 import "md-editor-v3/lib/style.css"
-import Comments from "@C/Comments.vue"
-import { getArticle } from "../api/blog";
+// import Comments from "@C/Comments.vue"
+import { apiArticle } from "../../api/blog";
+import { Back } from '@icon-park/vue-next';
 const router = useRouter()
 const route = useRoute()
+const is_admin = window.localStorage.getItem('admin_psw') == 'liangyaokang';
+
+
 const previewOnly = ref(false)
 
 const id = route.query.id as string || 0
@@ -64,7 +65,7 @@ const onGetCatalog = (list: []) => {
 }
 
 const getDetail = () => {
-    getArticle("/getArticleDetail", {
+    apiArticle("/getArticleDetail", {
         id: id
     }).then((res: any) => {
         detail.value = res
@@ -74,7 +75,7 @@ const getDetail = () => {
 }
 
 const submit = () => {
-    getArticle("/updateArticleDetail", {
+    apiArticle("/updateArticleDetail", {
         id: id,
         md_html: htmltext.value,
         text: text.value,
@@ -84,8 +85,8 @@ const submit = () => {
 }
 getDetail()
 
-const comment_data = reactive([])
-const comment_total = ref(0)
+// const comment_data = reactive([])
+// const comment_total = ref(0)
 MdEditor.config({
     editorExtensions: {
         highlight: {
@@ -142,9 +143,16 @@ const goAnchor = (selector: any) => {
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
+    vertical-align: middle;
+
+    .back {
+        float: left;
+    }
+
+    .btn {
+        float: right;
+    }
 
     .title {
         font-size: 22px;
@@ -160,7 +168,15 @@ const goAnchor = (selector: any) => {
         flex: 1;
     }
 
+
+    .aside2 {
+        width: 0;
+        margin-right: 0px;
+        transition: all 0.5s ease-in-out;
+    }
+
     .aside {
+        width: 280px;
         margin-right: 20px;
 
         .card {
@@ -169,5 +185,7 @@ const goAnchor = (selector: any) => {
             top: 0;
         }
     }
+
+
 }
 </style>

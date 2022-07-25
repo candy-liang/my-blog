@@ -3,8 +3,8 @@
         <Header />
         <div class="main">
             <router-view></router-view>
+            <el-backtop :bottom="100" :visibility-height="50"></el-backtop>
         </div>
-        <el-backtop :bottom="100" :visibility-height="50"></el-backtop>
         <Footer />
     </el-config-provider>
 </template>

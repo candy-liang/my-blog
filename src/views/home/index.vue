@@ -1,7 +1,7 @@
 <template>
     <div class="menu">
         <el-card class="card">
-            <el-radio-group v-model="current_class" @change="getArticleList">
+            <el-radio-group v-model="current_class" @change="changeClass">
                 <el-radio-button v-for="item in menu_list" :label="item.type">{{ item.name }}</el-radio-button>
             </el-radio-group>
         </el-card>
@@ -48,7 +48,8 @@
 
             <el-card class="card">
                 <h3>友链
-                    <el-button :icon="Plus" @click="applyFriendLink" title="申请添加友链" class="ml10" circle size="small" />
+                    <el-button :icon="Plus" @click="friend_link_dialog = true" title="申请添加友链" class="ml10" circle
+                        size="small" />
                 </h3>
                 <div class="friend-link" v-for="item in friend_list" @click="linkTo(item.link)"
                     :title="item.introduction" v-show="item.status == 'show'">
@@ -66,11 +67,11 @@
         </div>
 
     </div>
-    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[10, 20, 50, 100]"
+    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[5, 10, 20, 50]"
         background layout="total,prev,pager,next,sizes" :total="total" @size-change="sizeChange"
         @current-change="currentChange" v-show="total > 0" />
 
-    <el-dialog v-model="add_friend_link_dialog" title="填写友链信息" width="500px " center>
+    <el-dialog v-model="friend_link_dialog" title="填写友链信息" width="500px " center>
         <el-form label-width="90px">
             <el-form-item label="友链名称" required>
                 <el-input v-model="new_friendLink.name" />
@@ -87,8 +88,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="createFriendLink">确定</el-button>
-                <el-button @click="add_friend_link_dialog = false">取消</el-button>
+                <el-button type="primary" @click="applyFriendLink">确定</el-button>
+                <el-button @click="friend_link_dialog = false">取消</el-button>
             </span>
         </template>
     </el-dialog>
@@ -96,56 +97,45 @@
 
 <script setup lang="ts">
 import { Comment, PreviewOpen, Calendar } from "@icon-park/vue-next"
-import { getArticle, getFriendLink } from "../api/blog"
-import { ArticleClass } from "../type/article.type"
+import { apiArticle, apiFriendLink } from "../../api/blog"
+import { ArticleClass } from "../../type/article.type"
 import { Plus } from '@element-plus/icons-vue'
+import { updateQuery, skipRouter } from "../../hooks/router.hook";
 const route = useRoute()
-const router = useRouter()
-const current_class = ref("all")
-current_class.value = route.query.current_class as string || 'all'
-
 
 // 获取分类总览
 let menu_list = ref<ArticleClass[]>([])
-getArticle("/getArticleClass").then((res: any) => {
+apiArticle("/getArticleClass").then((res: any) => {
     menu_list.value = res
 })
 
 // 获取热门文章
 const hot_article = ref<any[]>([])
-getArticle("/getHotArticleList").then((res: any) => {
+apiArticle("/getHotArticleList").then((res: any) => {
     hot_article.value = res
 })
 
 // 获取友链
 const friend_list = ref<any[]>([])
-getFriendLink("/getFriendLink", { type: 'show' }).then((res: any) => {
+apiFriendLink("/getFriendLink", { type: 'show' }).then((res: any) => {
     friend_list.value = res.list
 })
 
 // 获取当前分类文章列表
 const article_list = ref<any[]>([])
-const loading = ref(false)  //列表loading
-const current_page = ref(1) //当前页码
-const page_size = ref(10)   //每页数
-const total = ref(0)    //文章总数
-const key = ref("")
-key.value = route.query.key as string || ''
+const loading = ref(false)      //列表loading
+const current_class = ref("all")//当前分类
+const current_page = ref(1)     //当前页码
+const page_size = ref(5)        //每页数
+const total = ref(0)            //文章总数
+const key = ref("")             //当前搜索值
+current_class.value = route.query.current_class as string || 'all'
 current_page.value = Number(route.query.current_page as string) || 1
-page_size.value = Number(route.query.page_size as string) || 10
-const reflashRouter = () => {
-    router.push({
-        name: 'blog',
-        query: {
-            current_class: current_class.value,
-            current_page: current_page.value,
-            page_size: page_size.value,
-            key: key.value
-        }
-    })
-}
+page_size.value = Number(route.query.page_size as string) || 5
+
 const getArticleList = () => {
-    getArticle("/getArticleList", {
+    loading.value = true
+    apiArticle("/getArticleList", {
         type: current_class.value,
         current_page: current_page.value,
         page_size: page_size.value,
@@ -160,14 +150,22 @@ const getArticleList = () => {
 }
 getArticleList()
 
+// 更改每页文章数量
 const sizeChange = (val: number) => {
+    current_page.value = 1
     page_size.value = val
-    reflashRouter()
+    updateQuery(route, { page_size: val, current_page: 1 })
     getArticleList()
 }
+// 更改当前页
 const currentChange = (val: number) => {
     current_page.value = val
-    reflashRouter()
+    updateQuery(route, { current_page: val })
+    getArticleList()
+}
+// 更改分类
+const changeClass = () => {
+    updateQuery(route, { current_class: current_class.value })
     getArticleList()
 }
 
@@ -177,36 +175,34 @@ const linkTo = (link: string) => {
 }
 // 查看文章
 const checkArticle = (id: number) => {
-    router.push({
-        name: 'detail',
-        query: {
-            id: id
-        }
-    })
+    skipRouter('detail', { id })
 }
-const add_friend_link_dialog = ref(false)   //申请友链弹窗
+
+const friend_link_dialog = ref(false)   //申请友链弹窗
 const new_friendLink = reactive({  //申请友链配置
     name: "",
     logo: "",
     introduction: "",
     link: "",
 })
+// 确认申请友链
 const applyFriendLink = () => {
-    add_friend_link_dialog.value = true
-
-}
-const createFriendLink = () => {
     const { name, link, logo } = new_friendLink
     if (!name || !link || !logo) {
         ElMessage.warning('需填项均不能为空')
         return
     }
-    getFriendLink("/createFriendLink", { ...new_friendLink }).then((res: any) => {
+    apiFriendLink("/applyFriendLink", { ...new_friendLink }).then((res: any) => {
         ElMessage.success('已提交申请，请等待博主审核')
-        add_friend_link_dialog.value = false
+        friend_link_dialog.value = false
     })
 }
 
+// 监听搜索key变化,重新获取列表数据
+watchEffect(async () => {
+    key.value = route.query.key as string
+    await getArticleList()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -226,12 +222,14 @@ const createFriendLink = () => {
 
 .menu {
     width: 80%;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .blog {
     display: flex;
     width: 80%;
+    max-width: 1200px;
     margin: 0 auto;
 }
 

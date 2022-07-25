@@ -28,7 +28,7 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[10, 20, 50, 100]"
+    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[2, 20, 50, 100]"
         background layout="total,sizes,prev,pager,next" :total="total" @size-change="sizeChange"
         @current-change="currentChange" />
 
@@ -61,11 +61,11 @@
               
               
 <script setup lang="ts">
-import { getArticle } from "../../api/blog";
-import { ArticleClass } from "../../type/article.type"
+import { apiArticle } from "../../../api/blog";
+import { ArticleClass } from "../../../type/article.type"
 import { Search } from '@element-plus/icons-vue'
+import { updateQuery, skipRouter } from "../../../hooks/router.hook";
 const route = useRoute()
-const router = useRouter()
 const dialog_type = ref('')
 const cur_id = ref(0)
 const add_article_dialog = ref(false)   //新增文章弹窗
@@ -95,7 +95,7 @@ const addArticle = (type: string, row?: any) => {
 // -----------获取文章分类-----------------
 const cur_class = ref('all')    //当前分类
 const class_list = ref<ArticleClass[]>([])
-getArticle("/getArticleClass").then((res: any) => {
+apiArticle("/getArticleClass").then((res: any) => {
     class_list.value = res
 })
 // 创建文章/修改文章
@@ -106,7 +106,7 @@ const createArticle = () => {
     }
     const is_add = dialog_type.value == 'add'
     let param = is_add ? { ...new_article } : { id: cur_id.value, ...new_article }
-    getArticle("/createArticle", param).then((res: any) => {
+    apiArticle("/createArticle", param).then((res: any) => {
         ElMessage.success(is_add ? '创建成功' : '修改成功')
         add_article_dialog.value = false
         getTableData()
@@ -124,15 +124,7 @@ current_page.value = Number(route.query.current_page as string) || 1
 page_size.value = Number(route.query.page_size as string) || 10
 const getTableData = () => {
     loading.value = true
-    router.push({
-        name: 'admin',
-        query: {
-            active_name: route.query.active_name,
-            current_page: current_page.value,
-            page_size: page_size.value
-        }
-    })
-    getArticle("/getArticleList", {
+    apiArticle("/getArticleList", {
         type: cur_class.value,
         current_page: current_page.value,
         page_size: page_size.value,
@@ -163,7 +155,7 @@ const deleteArticle = () => {
             type: 'warning',
         }
     ).then(() => {
-        getArticle("/deleteArticle", {
+        apiArticle("/deleteArticle", {
             id: table_selected.value.map((v: any) => v.id),
         }).then((res: any) => {
             ElMessage.success('删除成功')
@@ -178,17 +170,19 @@ const handleSelect = (val: any) => {
 }
 // 查看文章
 const checkArticle = (id: number) => {
-    router.push({
-        name: 'detail',
-        query: { id: id }
-    })
+    skipRouter('detail', { id: id })
 }
+// 更改每页文章数量
 const sizeChange = (val: number) => {
+    current_page.value = 1
     page_size.value = val
+    updateQuery(route, { page_size: val, current_page: 1 })
     getTableData()
 }
+// 更改当前页
 const currentChange = (val: number) => {
     current_page.value = val
+    updateQuery(route, { current_page: val })
     getTableData()
 }
 </script>
