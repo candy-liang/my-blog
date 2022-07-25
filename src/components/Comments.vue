@@ -1,5 +1,5 @@
 <template>
-    <div id="comment">
+    <!-- <div id="comment">
         <div class="publish">
             <h3>发表评论 <edit-two theme="outline" size="18" /></h3>
             <div class="publish-main">
@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script setup lang="ts">

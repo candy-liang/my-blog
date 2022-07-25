@@ -33,7 +33,7 @@ export default defineConfig({
     // 设置代理，根据我们项目实际情况配置
     proxy: {
       '/dev': {
-        target: 'http://192.168.32.91:8000',
+        target: 'http://192.168.0.4:8000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace('/dev', '')
@@ -49,7 +49,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'), // 设置 `@` 指向 `src` 目录
-      '@C': resolve(__dirname, 'src/components'), // 设置 `@` 指向 `src` 目录
+      '@C': resolve(__dirname, 'src/components'), 
+      '@H': resolve(__dirname, 'src/hooks'), 
+      '@A': resolve(__dirname, 'src/api'), 
     }
   },
   css: {
@@ -59,6 +61,27 @@ export default defineConfig({
         additionalData: '@import "./public/style/global.scss";'
       }
     }
-  }
+  },
+  build: {
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        //生产环境时移除console
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    //指定生成静态资源的存放路径
+    assetsDir: "/",
+
+    rollupOptions: {
+      //打包目录区分优化
+      output: {
+        chunkFileNames: "static/[name]-[hash].js",
+        entryFileNames: "static/[name]-[hash].js",
+        assetFileNames: "static/[name]-[hash].[ext]",
+      },
+    },
+  },
 })
 

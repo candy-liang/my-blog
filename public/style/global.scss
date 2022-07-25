@@ -4,36 +4,38 @@ body {
 
 @mixin textEllipsis($lineNum) {
     @if $lineNum==1 {
-        overflow     : hidden;
+        overflow: hidden;
         text-overflow: ellipsis;
-        white-space  : nowrap;
+        white-space: nowrap;
     }
 
     @else {
-        display           : -webkit-box;
-        word-break        : break-all;
+        display: -webkit-box;
+        word-break: break-all;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: $lineNum; //需要显示的行数
-        overflow          : hidden;
-        text-overflow     : ellipsis;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
 
 
 .aside {
-    color       : #666;
-    width       : 280px;
+    color: #666;
+    width: 280px;
 
     .card {
         li {
-            line-height  : 30px;
+            line-height: 30px;
             border-radius: 4px;
-            cursor       : pointer;
+            cursor: pointer;
 
             &:hover {
-                color           : #333;
+                color: #333;
                 background-color: #eee;
+                transform: scale(1.05);
+                transition: all 0.3s linear;
             }
         }
     }
@@ -44,20 +46,20 @@ body {
 
     /*滚动条宽或高*/
     &::-webkit-scrollbar {
-        width : 8px;
+        width: 8px;
         height: 8px;
     }
 
     /*正常情况下滑块的样式*/
     &::-webkit-scrollbar-thumb {
         background-color: #999;
-        border-radius   : 5px;
+        border-radius: 5px;
     }
 
     /*鼠标悬浮在该类指向的控件上时滑块的样式*/
     &:hover::-webkit-scrollbar-thumb {
         background-color: #999;
-        border-radius   : 5px;
+        border-radius: 5px;
     }
 
     /*鼠标悬浮在滑块上时滑块的样式*/
@@ -67,7 +69,7 @@ body {
 
     /*正常时候的主干部分*/
     &::-webkit-scrollbar-track {
-        border-radius   : 5px;
+        border-radius: 5px;
         background-color: white;
     }
 

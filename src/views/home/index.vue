@@ -58,7 +58,7 @@
                     </el-avatar>
                     <div class="name">
                         <h4>{{ item.name }}</h4>
-                        <p>—{{ item.introduction }}</p>
+                        <p>— {{ item.introduction }}</p>
                     </div>
                 </div>
                 <el-empty v-show="friend_list.length == 0" :image-size="100" style="padding:10px 0"
@@ -144,7 +144,7 @@ const getArticleList = () => {
         article_list.value = res.list
         total.value = res.total
         loading.value = false
-    }).catch(e => {
+    }).catch(() => {
         loading.value = false
     })
 }
@@ -224,6 +224,9 @@ watchEffect(async () => {
     width: 80%;
     max-width: 1200px;
     margin: 0 auto;
+    .el-radio-button{
+        margin-bottom: 10px;
+    }
 }
 
 .blog {
@@ -242,7 +245,9 @@ watchEffect(async () => {
         cursor: pointer;
 
         &:hover {
-            box-shadow: 0px 0px 12px rgba(42, 228, 219, 0.3);
+            transform: scale(1.01);
+            transition: all 0.3s linear;
+            box-shadow: 0px 0px 12px rgba(64, 158, 255, 0.5);
         }
 
         .description {
@@ -308,7 +313,7 @@ watchEffect(async () => {
         color: #666;
 
         li {
-            padding: 0 5px;
+            padding: 0 10px;
         }
     }
 

@@ -15,8 +15,9 @@
             <p class="content mb15">{{ item.content }}</p>
             <p class="tar time">{{ item.createdAt }}</p>
         </el-card>
-        <el-pagination :currentPage="current_page" class="pagination" background layout="total,prev,pager,next"
-            :total="total" @current-change="currentChange" />
+        <el-empty v-show="total == 0" :image-size="100" description="暂无留言,快来抢个前排吧 (ฅ´ω`ฅ)" />
+        <el-pagination v-show="total > 0" :currentPage="current_page" class="pagination" background
+            layout="total,prev,pager,next" :total="total" @current-change="currentChange" />
     </div>
 </template>
 
