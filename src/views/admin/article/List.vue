@@ -15,9 +15,19 @@
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="sort" label="排序权重" align="center" width="90" />
         <el-table-column prop="title" label="标题" align="center"></el-table-column>
-        <el-table-column prop="type" label="类型" align="center" width="80" />
+        <el-table-column label="分类" align="center" width="80">
+            <template #default="scope">
+                <span>{{ class_label[scope.row.type] }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="description" label="描述" align="center" />
-        <el-table-column prop="id" label="评论数" align="center" width="70" />
+        <el-table-column label="海报" align="center" width="70">
+            <template #default="scope">
+                <el-avatar :src="scope.row.poster" shape="square">
+                    <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+                </el-avatar>
+            </template>
+        </el-table-column>
         <el-table-column prop="view_count" label="浏览数" align="center" width="70" />
         <el-table-column prop="createdAt" label="创建时间" align="center" />
         <el-table-column prop="updatedAt" label="更新时间" align="center" />
@@ -46,6 +56,9 @@
             <el-form-item label="文章描述">
                 <el-input v-model="new_article.description" autosize type="textarea" />
             </el-form-item>
+            <el-form-item label="封面地址">
+                <el-input v-model="new_article.poster" autosize type="textarea" />
+            </el-form-item>
             <el-form-item label="排序权重">
                 <el-input-number v-model="new_article.sort" style="width:100%" :min="1" :max="100" />
             </el-form-item>
@@ -73,21 +86,24 @@ const new_article = reactive({  //新增文章配置
     title: "",
     type: "",
     description: "",
+    poster: "",
     sort: 1,
 })
 const addArticle = (type: string, row?: any) => {
     dialog_type.value = type
     if (type == 'edit') {
-        const { id, title, type, description, sort } = row
+        const { id, title, type, description, sort, poster } = row
         cur_id.value = id
         new_article.title = title
         new_article.type = type
         new_article.description = description
         new_article.sort = sort
+        new_article.poster = poster
     } else {
         new_article.title = ''
         new_article.type = ''
         new_article.description = ''
+        new_article.poster = ''
         new_article.sort = 1
     }
     add_article_dialog.value = true
@@ -95,13 +111,15 @@ const addArticle = (type: string, row?: any) => {
 // -----------获取文章分类-----------------
 const cur_class = ref('all')    //当前分类
 const class_list = ref<ArticleClass[]>([])
+const class_label = ref<any>({})
 apiArticle("/getArticleClass").then((res: any) => {
-    class_list.value = res
+    class_list.value = res.list
+    class_label.value = res.label
 })
 // 创建文章/修改文章
 const createArticle = () => {
-    if (!new_article.title || !new_article.type) {
-        ElMessage.warning('文章标题与所属分类都不能为空')
+    if (!new_article.title || !new_article.type || !new_article.poster) {
+        ElMessage.warning('不能为空')
         return
     }
     const is_add = dialog_type.value == 'add'

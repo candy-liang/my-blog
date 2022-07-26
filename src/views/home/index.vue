@@ -2,7 +2,9 @@
     <div class="menu">
         <el-card class="card">
             <el-radio-group v-model="current_class" @change="changeClass">
-                <el-radio-button v-for="item in menu_list" :label="item.type">{{ item.name }}</el-radio-button>
+                <el-radio-button v-for="item in menu_list" v-show="item.count>0" :label="item.type">
+                {{ item.name }}
+                </el-radio-button>
             </el-radio-group>
         </el-card>
     </div>
@@ -22,8 +24,8 @@
                             </div>
                         </div>
                         <div class="correlation">
-                            <comment theme="outline" size="18" />
-                            <span class="item">{{ item.comment_count }}</span>
+                            <application-two theme="outline" size="18" />
+                            <span class="item">{{ class_label[item.type] }}</span>
                             <preview-open theme="outline" size="20" />
                             <span class="item">{{ item.view_count }}</span>
                             <calendar theme="outline" size="18" />
@@ -96,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { Comment, PreviewOpen, Calendar } from "@icon-park/vue-next"
+import { ApplicationTwo, PreviewOpen, Calendar } from "@icon-park/vue-next"
 import { apiArticle, apiFriendLink } from "../../api/blog"
 import { ArticleClass } from "../../type/article.type"
 import { Plus } from '@element-plus/icons-vue'
@@ -104,9 +106,11 @@ import { updateQuery, skipRouter } from "../../hooks/router.hook";
 const route = useRoute()
 
 // 获取分类总览
-let menu_list = ref<ArticleClass[]>([])
+const menu_list = ref<ArticleClass[]>([])
+const class_label = ref<any>({})
 apiArticle("/getArticleClass").then((res: any) => {
-    menu_list.value = res
+    menu_list.value = res.list
+    class_label.value = res.label
 })
 
 // 获取热门文章
@@ -224,7 +228,8 @@ watchEffect(async () => {
     width: 80%;
     max-width: 1200px;
     margin: 0 auto;
-    .el-radio-button{
+
+    .el-radio-button {
         margin-bottom: 10px;
     }
 }

@@ -54,7 +54,7 @@ let tableData = ref<ArticleClass[]>([])
 const getTableData = () => {
     loading.value = true
     apiArticle("/getArticleClass").then((res: any) => {
-        tableData.value = res
+        tableData.value = res.list
         loading.value = false
     }).catch(e => {
         loading.value = false

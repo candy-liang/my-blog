@@ -13,16 +13,7 @@
         </div>
     </el-card>
     <div id="detail">
-        <div class="aside2" v-if="!previewOnly" :class="{ aside: catalogList.length > 0 }">
-            <el-card class="card">
-                <h3>目录</h3>
-                <ul>
-                    <li v-for="item in catalogList" :class="'title' + item.level" @click="goAnchor(item.text)">
-                        {{ item.text }}
-                    </li>
-                </ul>
-            </el-card>
-        </div>
+
         <!-- 文章详情 -->
         <div class="center">
             <el-card class="card detail">
@@ -36,6 +27,16 @@
             <!-- <el-card class="card">
                 <Comments :data="comment_data" :total="comment_total"></Comments>
             </el-card> -->
+        </div>
+        <div class="aside2" v-if="!previewOnly" :class="{ aside: catalogList.length > 0 }">
+            <el-card class="card">
+                <h3>目录</h3>
+                <ul>
+                    <li v-for="item in catalogList" :class="'title' + item.level" @click="goAnchor(item.text)">
+                        {{ item.text }}
+                    </li>
+                </ul>
+            </el-card>
         </div>
     </div>
 </template>
@@ -171,13 +172,13 @@ const goAnchor = (selector: any) => {
 
     .aside2 {
         width: 0;
-        margin-right: 0px;
+        margin-left: 0px;
         transition: all 0.5s ease-in-out;
     }
 
     .aside {
         width: 280px;
-        margin-right: 20px;
+        margin-left: 20px;
 
         .card {
             position: -webkit-sticky;
