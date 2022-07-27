@@ -13,9 +13,8 @@
         </div>
     </el-card>
     <div id="detail">
-
         <!-- 文章详情 -->
-        <div class="center">
+        <div class="center" v-loading="loading">
             <el-card class="card detail">
                 <md-editor editorId="my-editor" v-model="text" v-show="previewOnly" :preview="false" code-theme="atoms"
                     @onHtmlChanged="saveHtml" @onGetCatalog="onGetCatalog" style="height:600px" />
@@ -65,13 +64,18 @@ const onGetCatalog = (list: []) => {
     catalogList.value = list
 }
 
+const loading = ref(false)
 const getDetail = () => {
+    loading.value = true
     apiArticle("/getArticleDetail", {
         id: id
     }).then((res: any) => {
         detail.value = res
         htmltext.value = res.md_html || ''
         text.value = res.text
+        loading.value = false
+    }).catch(() => {
+        loading.value = false
     })
 }
 
@@ -173,7 +177,7 @@ const goAnchor = (selector: any) => {
     .aside2 {
         width: 0;
         margin-left: 0px;
-        transition: all 0.5s ease-in-out;
+        transition: all 0.7s ease-in-out;
     }
 
     .aside {

@@ -2,8 +2,8 @@
     <div class="menu">
         <el-card class="card">
             <el-radio-group v-model="current_class" @change="changeClass">
-                <el-radio-button v-for="item in menu_list" v-show="item.count>0" :label="item.type">
-                {{ item.name }}
+                <el-radio-button v-for="item in menu_list" v-show="item.count > 0" :label="item.type">
+                    {{ item.name }}
                 </el-radio-button>
             </el-radio-group>
         </el-card>
@@ -47,25 +47,7 @@
                 <el-empty v-show="hot_article.length == 0" :image-size="100" style="padding:10px 0"
                     description="暂无文章" />
             </el-card>
-
-            <el-card class="card">
-                <h3>友链
-                    <el-button :icon="Plus" @click="friend_link_dialog = true" title="申请添加友链" class="ml10" circle
-                        size="small" />
-                </h3>
-                <div class="friend-link" v-for="item in friend_list" @click="linkTo(item.link)"
-                    :title="item.introduction" v-show="item.status == 'show'">
-                    <el-avatar :src="item.logo">
-                        <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-                    </el-avatar>
-                    <div class="name">
-                        <h4>{{ item.name }}</h4>
-                        <p>— {{ item.introduction }}</p>
-                    </div>
-                </div>
-                <el-empty v-show="friend_list.length == 0" :image-size="100" style="padding:10px 0"
-                    description="暂无友链" />
-            </el-card>
+            <Friend />
         </div>
 
     </div>
@@ -73,36 +55,16 @@
         background layout="total,prev,pager,next,sizes" :total="total" @size-change="sizeChange"
         @current-change="currentChange" v-show="total > 0" />
 
-    <el-dialog v-model="friend_link_dialog" title="填写友链信息" width="500px " center>
-        <el-form label-width="90px">
-            <el-form-item label="友链名称" required>
-                <el-input v-model="new_friendLink.name" />
-            </el-form-item>
-            <el-form-item label="logo地址" required>
-                <el-input v-model="new_friendLink.logo" />
-            </el-form-item>
-            <el-form-item label="友链地址" required>
-                <el-input v-model="new_friendLink.link" />
-            </el-form-item>
-            <el-form-item label="简介描述">
-                <el-input v-model="new_friendLink.introduction" autosize type="textarea" />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button type="primary" @click="applyFriendLink">确定</el-button>
-                <el-button @click="friend_link_dialog = false">取消</el-button>
-            </span>
-        </template>
-    </el-dialog>
+
 </template>
 
 <script setup lang="ts">
 import { ApplicationTwo, PreviewOpen, Calendar } from "@icon-park/vue-next"
-import { apiArticle, apiFriendLink } from "../../api/blog"
+import { apiArticle } from "../../api/blog"
 import { ArticleClass } from "../../type/article.type"
-import { Plus } from '@element-plus/icons-vue'
 import { updateQuery, skipRouter } from "../../hooks/router.hook";
+import Friend from "../friend/index.vue";
+
 const route = useRoute()
 
 // 获取分类总览
@@ -119,11 +81,7 @@ apiArticle("/getHotArticleList").then((res: any) => {
     hot_article.value = res
 })
 
-// 获取友链
-const friend_list = ref<any[]>([])
-apiFriendLink("/getFriendLink", { type: 'show' }).then((res: any) => {
-    friend_list.value = res.list
-})
+
 
 // 获取当前分类文章列表
 const article_list = ref<any[]>([])
@@ -173,34 +131,13 @@ const changeClass = () => {
     getArticleList()
 }
 
-// 友链跳转
-const linkTo = (link: string) => {
-    window.open(link, '_blank')
-}
+
 // 查看文章
 const checkArticle = (id: number) => {
     skipRouter('detail', { id })
 }
 
-const friend_link_dialog = ref(false)   //申请友链弹窗
-const new_friendLink = reactive({  //申请友链配置
-    name: "",
-    logo: "",
-    introduction: "",
-    link: "",
-})
-// 确认申请友链
-const applyFriendLink = () => {
-    const { name, link, logo } = new_friendLink
-    if (!name || !link || !logo) {
-        ElMessage.warning('需填项均不能为空')
-        return
-    }
-    apiFriendLink("/applyFriendLink", { ...new_friendLink }).then((res: any) => {
-        ElMessage.success('已提交申请，请等待博主审核')
-        friend_link_dialog.value = false
-    })
-}
+
 
 // 监听搜索key变化,重新获取列表数据
 watchEffect(async () => {
@@ -250,9 +187,9 @@ watchEffect(async () => {
         cursor: pointer;
 
         &:hover {
-            transform: scale(1.01);
-            transition: all 0.3s linear;
-            box-shadow: 0px 0px 12px rgba(64, 158, 255, 0.5);
+            // transform: scale(1.01);
+            // transition: all 0.3s linear;
+            animation: breathe 2s ease-in-out infinite;
         }
 
         .description {
@@ -322,43 +259,25 @@ watchEffect(async () => {
         }
     }
 
-    .tag-list {
-        .el-check-tag {
-            margin: 0 10px 10px 0;
-        }
-    }
-
-    .friend-link {
-        display: flex;
-        margin-bottom: 15px;
-        cursor: pointer;
-
-        &:hover {
-            h4 {
-                color: #409eff;
-            }
-        }
-
-        .name {
-            flex: 1;
-            margin-left: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            line-height: 20px;
-            color: #666;
-            @include textEllipsis(1);
-
-            p {
-                font-size: 12px;
-                color: #aaa;
-                @include textEllipsis(1);
-            }
-        }
-    }
 }
 
 .ml10 {
     margin-left: 10px;
+}
+
+@keyframes breathe {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0px 0px 12px rgba(64, 158, 255, 0.5);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 @media screen and (max-width: 1366px) {
