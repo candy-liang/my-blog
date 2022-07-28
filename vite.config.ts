@@ -39,7 +39,7 @@ export default defineConfig({
         rewrite: (path) => path.replace('/dev', '')
       },
       '/mock': {
-        target: 'http://42.194.209.27:8000',
+        target: 'http://42.194.209.27:3000',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace('/mock', '')

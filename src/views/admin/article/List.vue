@@ -33,8 +33,11 @@
                 <span>{{ class_label[scope.row.type] }}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="description" label="描述" align="center" min-width="140" />
-
+        <el-table-column label="描述" align="center" min-width="140">
+            <template #default="scope">
+                <span class="description" :title="scope.row.description">{{ scope.row.description }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="view_count" label="浏览数" align="center" width="90" />
         <el-table-column prop="createdAt" label="创建时间" align="center" min-width="104" />
         <el-table-column prop="updatedAt" label="更新时间" align="center" min-width="104" />
@@ -245,5 +248,10 @@ const currentChange = (val: number) => {
 .pagination {
     justify-content: flex-end;
     margin-top: 20px;
+}
+
+.description {
+    @include textEllipsis(3);
+
 }
 </style>

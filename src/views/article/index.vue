@@ -31,7 +31,7 @@
             <el-card class="card">
                 <h3>目录</h3>
                 <ul>
-                    <li v-for="item in catalogList" :class="'title' + item.level" @click="goAnchor(item.text)">
+                    <li v-for="item in catalogList" :class="'title' + item.level" @click="goAnchor(item.text)" :title="item.text">
                         {{ item.text }}
                     </li>
                 </ul>
@@ -178,6 +178,11 @@ const goAnchor = (selector: any) => {
         width: 0;
         margin-left: 0px;
         transition: all 0.7s ease-in-out;
+        ul{
+            max-height: 60vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
     }
 
     .aside {

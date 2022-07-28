@@ -1,5 +1,5 @@
 <template>
-    <el-config-provider :locale="zhCn">
+    <el-config-provider :locale="zhCn" v-if="is_home">
         <Header />
         <div class="main">
             <router-view></router-view>
@@ -7,7 +7,7 @@
                 <rocket-one theme="outline" size="24" title='回到顶部' />
             </el-backtop>
         </div>
-        <Footer />
+        <!-- <Footer /> -->
     </el-config-provider>
     <div class="enter-poster" v-if="is_poster">
         <p>欢 迎 来 到 candy 的 博 客</p>
@@ -22,9 +22,15 @@ import { RocketOne } from "@icon-park/vue-next"
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 
 const is_poster = ref(false)
+const is_home = ref(false)
 if (!window.sessionStorage.getItem('isPoster')) {
     is_poster.value = true
     window.sessionStorage.setItem('isPoster', 'true')
+    setTimeout(() => {
+        is_home.value = true
+    }, 500);
+} else {
+    is_home.value = true
 }
 </script>
 
@@ -45,7 +51,6 @@ if (!window.sessionStorage.getItem('isPoster')) {
 @import "/style/reset.css";
 
 .enter-poster {
-
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -57,17 +62,15 @@ if (!window.sessionStorage.getItem('isPoster')) {
     width: 100%;
     height: 100%;
     z-index: 4000;
-    background: url("@/assets/star.jpeg");
+    background: url("@/assets/poster.jpeg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    font-size: 40px;
     animation: poster 2s ease-in-out 3s both;
 
     p {
-        font-family: STXinwei;
-        font-size: calc(100vw * 60 / 1920);
         animation: tracking 2s ease-in-out 0.5s both;
-        letter-spacing: 0.3em;
     }
 }
 
