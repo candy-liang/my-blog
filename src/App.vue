@@ -7,7 +7,7 @@
                 <rocket-one theme="outline" size="24" title='回到顶部' />
             </el-backtop>
         </div>
-        <!-- <Footer /> -->
+        <Footer />
     </el-config-provider>
     <div class="enter-poster" v-if="is_poster">
         <p>欢 迎 来 到 candy 的 博 客</p>
@@ -45,6 +45,7 @@ if (!window.sessionStorage.getItem('isPoster')) {
 @import "/style/reset.css";
 
 .enter-poster {
+
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -56,15 +57,17 @@ if (!window.sessionStorage.getItem('isPoster')) {
     width: 100%;
     height: 100%;
     z-index: 4000;
-    background: url("@/assets/poster.jpeg");
+    background: url("@/assets/star.jpeg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    font-size: 40px;
     animation: poster 2s ease-in-out 3s both;
 
     p {
+        font-family: STXinwei;
+        font-size: calc(100vw * 60 / 1920);
         animation: tracking 2s ease-in-out 0.5s both;
+        letter-spacing: 0.3em;
     }
 }
 

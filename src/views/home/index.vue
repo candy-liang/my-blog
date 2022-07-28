@@ -35,6 +35,10 @@
                 </li>
             </ul>
             <el-empty v-show="total == 0" :image-size="200" description="暂无文章,请浏览其他分类" />
+            <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination"
+                :page-sizes="[5, 10, 20, 50]" background layout="total,prev,pager,next,sizes" :total="total"
+                @size-change="sizeChange" @current-change="currentChange" v-show="total > 0" />
+
         </div>
 
         <!-- 热门文章/标签/友链 -->
@@ -51,9 +55,6 @@
         </div>
 
     </div>
-    <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination" :page-sizes="[5, 10, 20, 50]"
-        background layout="total,prev,pager,next,sizes" :total="total" @size-change="sizeChange"
-        @current-change="currentChange" v-show="total > 0" />
 
 
 </template>
@@ -103,7 +104,7 @@ const getArticleList = () => {
         page_size: page_size.value,
         key: key.value,
     }).then((res: any) => {
-        article_list.value = res.list
+        article_list.value = res.list.filter((v:any) => v.status == 'show')
         total.value = res.total
         loading.value = false
     }).catch(() => {
@@ -234,7 +235,7 @@ watchEffect(async () => {
 }
 
 .pagination {
-    justify-content: center;
+    justify-content: flex-end;
 
     li,
     .btn-prev,

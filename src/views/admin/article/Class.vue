@@ -12,7 +12,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="type" label="类型" align="center" />
-        <el-table-column prop="count" label="拥有文章数" width="180" align="center" />
+        <el-table-column prop="count" label="拥有文章数" width="100" align="center" />
         <el-table-column prop="createdAt" label="创建时间" width="180" align="center" />
         <el-table-column prop="updatedAt" label="更新时间" width="180" align="center" />
         <el-table-column label="操作" align="center" width="140">

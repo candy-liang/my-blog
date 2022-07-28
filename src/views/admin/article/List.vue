@@ -14,24 +14,31 @@
     <el-table :data="table_data" v-loading="loading" border @selection-change="handleSelect">
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="sort" label="排序权重" align="center" width="90" />
-        <el-table-column prop="title" label="标题" align="center"></el-table-column>
-        <el-table-column label="分类" align="center" width="80">
+        <el-table-column label="状态" align="center" width="90">
             <template #default="scope">
-                <span>{{ class_label[scope.row.type] }}</span>
+                <el-switch v-model="scope.row.status" @change="changeStatus(scope.row)" active-value="show"
+                    inactive-value="hide" />
             </template>
         </el-table-column>
-        <el-table-column prop="description" label="描述" align="center" />
-        <el-table-column label="海报" align="center" width="70">
+        <el-table-column label="海报" align="center" width="90">
             <template #default="scope">
                 <el-avatar :src="scope.row.poster" shape="square">
                     <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
                 </el-avatar>
             </template>
         </el-table-column>
-        <el-table-column prop="view_count" label="浏览数" align="center" width="70" />
-        <el-table-column prop="createdAt" label="创建时间" align="center" />
-        <el-table-column prop="updatedAt" label="更新时间" align="center" />
-        <el-table-column label="操作" align="center" width="140">
+        <el-table-column prop="title" label="标题" align="center" min-width="140"></el-table-column>
+        <el-table-column label="分类" align="center" width="120">
+            <template #default="scope">
+                <span>{{ class_label[scope.row.type] }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="description" label="描述" align="center" min-width="140" />
+
+        <el-table-column prop="view_count" label="浏览数" align="center" width="90" />
+        <el-table-column prop="createdAt" label="创建时间" align="center" min-width="104" />
+        <el-table-column prop="updatedAt" label="更新时间" align="center" min-width="104" />
+        <el-table-column label="操作" align="center" min-width="140" fixed="right">
             <template #default="scope">
                 <el-button @click="addArticle('edit', scope.row)" size="small">编辑</el-button>
                 <el-button @click="checkArticle(scope.row.id)" size="small" type="primary" plain>查看</el-button>
@@ -58,6 +65,12 @@
             </el-form-item>
             <el-form-item label="封面地址">
                 <el-input v-model="new_article.poster" autosize type="textarea" />
+            </el-form-item>
+            <el-form-item label="激活状态">
+                <el-select v-model="new_article.status" style="width:100%">
+                    <el-option label="不显示" value="hide" />
+                    <el-option label="显示" value="show" />
+                </el-select>
             </el-form-item>
             <el-form-item label="排序权重">
                 <el-input-number v-model="new_article.sort" style="width:100%" :min="1" :max="100" />
@@ -87,23 +100,26 @@ const new_article = reactive({  //新增文章配置
     type: "",
     description: "",
     poster: "",
+    status: "show",
     sort: 1,
 })
 const addArticle = (type: string, row?: any) => {
     dialog_type.value = type
     if (type == 'edit') {
-        const { id, title, type, description, sort, poster } = row
+        const { id, title, type, description, sort, poster, status } = row
         cur_id.value = id
         new_article.title = title
         new_article.type = type
         new_article.description = description
         new_article.sort = sort
         new_article.poster = poster
+        new_article.status = status
     } else {
         new_article.title = ''
         new_article.type = ''
         new_article.description = ''
         new_article.poster = ''
+        new_article.status = 'show'
         new_article.sort = 1
     }
     add_article_dialog.value = true
@@ -130,7 +146,11 @@ const createArticle = () => {
         getTableData()
     })
 }
-
+const changeStatus = ((row: any) => {
+    apiArticle("/createArticle", { id: row.id, status: row.status }).then((res: any) => {
+        ElMessage.success('修改显示状态成功')
+    })
+})
 // -----------获取列表数据---------------
 const search_val = ref('')  //搜索值
 const current_page = ref(1) //当前页码
