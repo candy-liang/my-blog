@@ -5,7 +5,7 @@
                 size="small" />
         </h3>
         <div class="friend-link" v-for="item in friend_list" @click="linkTo(item.link)" :title="item.introduction"
-            v-show="item.status == 'show'">
+            v-show="friend_list.length && item.status == 'show'">
             <el-avatar :src="item.logo" class="avatar">
                 <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
             </el-avatar>
@@ -14,8 +14,21 @@
                 <p>— {{ item.introduction }}</p>
             </div>
         </div>
-        <el-empty v-show="friend_list.length == 0" :image-size="100" style="padding:10px 0" description="暂无友链" />
+        <el-skeleton style="width:100%;margin-bottom: 15px;" v-for="item in 4" v-show="skeleton_friend" animated>
+            <template #template>
+                <div style="display: flex">
+                    <el-skeleton-item variant="image" style="width: 40px; height: 40px;border-radius: 50%;" />
+                    <div style="flex:1;margin-left: 10px;">
+                        <el-skeleton-item variant="text" style="width: 40%" />
+                        <el-skeleton-item variant="text" style="width: 100%" />
+                    </div>
+                </div>
+            </template>
+        </el-skeleton>
+        <el-empty v-show="!skeleton_friend && !friend_list.length" :image-size="100" style="padding:10px 0"
+            description="暂无友链" />
     </el-card>
+
     <el-dialog v-model="friend_link_dialog" title="填写友链信息" width="500px " center>
         <el-form label-width="90px">
             <el-form-item label="友链名称" required>
@@ -46,9 +59,13 @@ import { Plus } from '@element-plus/icons-vue'
 import { apiFriendLink } from "../../api/blog"
 
 // 获取友链
+const skeleton_friend = ref(true)
 const friend_list = ref<any[]>([])
 apiFriendLink("/getFriendLink", { type: 'show' }).then((res: any) => {
     friend_list.value = res.list
+    skeleton_friend.value = false
+}).catch((e: any) => {
+    skeleton_friend.value = false
 })
 // 友链跳转
 const linkTo = (link: string) => {

@@ -62,15 +62,17 @@ if (!window.sessionStorage.getItem('isPoster')) {
     width: 100%;
     height: 100%;
     z-index: 4000;
-    background: url("@/assets/poster.jpeg");
+    background: url("@/assets/star.jpeg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    font-size: 40px;
     animation: poster 2s ease-in-out 3s both;
 
     p {
+        font-family: STXinwei;
+        font-size: calc(100vw * 60 / 1920);
         animation: tracking 2s ease-in-out 0.5s both;
+        letter-spacing: 0.3em;
     }
 }
 

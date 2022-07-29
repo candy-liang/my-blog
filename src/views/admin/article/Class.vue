@@ -3,7 +3,7 @@
         <el-button @click="addClass('add')" type="primary">新增</el-button>
         <el-button @click="deleteClass" type="danger">删除</el-button>
     </div>
-    <el-table :data="tableData" border @selection-change="handleSelect">
+    <el-table :data="tableData" v-loading="loading" border @selection-change="handleSelect">
         <el-table-column type="selection" :selectable="selectable" width="55" align="center" />
         <el-table-column prop="sort" label="排序权重" align="center" width="100" />
         <el-table-column prop="name" label="名称" align="center">

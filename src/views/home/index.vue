@@ -1,17 +1,26 @@
 <template>
     <div class="menu">
         <el-card class="card">
-            <el-radio-group v-model="current_class" @change="changeClass">
+            <el-radio-group v-model="current_class" v-show="menu_list.length" @change="changeClass">
                 <el-radio-button v-for="item in menu_list" v-show="item.count > 0" :label="item.type">
                     {{ item.name }}
                 </el-radio-button>
             </el-radio-group>
+            <el-skeleton style="width:100%" v-show="!menu_list.length" animated>
+                <template #template>
+                    <div style="display: flex;align-items: center;justify-items: space-between;">
+                        <el-skeleton-item variant="text" style="height: 32px;width: 88px;margin:0 16px 10px 0" />
+                        <el-skeleton-item variant="text" style="height: 32px;width: 88px;margin:0 16px 10px 0" />
+                        <el-skeleton-item variant="text" style="height: 32px;width: 88px;margin-bottom: 10px" />
+                    </div>
+                </template>
+            </el-skeleton>
         </el-card>
     </div>
     <div class="blog">
         <!-- 文章列表 -->
-        <div class="center">
-            <ul v-loading="loading" v-show="total > 0">
+        <div class="center" v-loading="loading">
+            <ul v-show="total > 0">
                 <li v-for="item in article_list" @click="checkArticle(item.id)">
                     <el-card class="card list">
                         <h3>{{ item.title }}</h3>
@@ -34,7 +43,7 @@
                     </el-card>
                 </li>
             </ul>
-            <el-empty v-show="total == 0" :image-size="200" description="暂无文章,请浏览其他分类" />
+            <el-empty v-show="!loading && total == 0" :image-size="200" description="暂无文章,请浏览其他分类" />
             <el-pagination :currentPage="current_page" :page-size="page_size" class="pagination"
                 :page-sizes="[5, 10, 20, 50]" background layout="total,prev,pager,next,sizes" :total="total"
                 @size-change="sizeChange" @current-change="currentChange" v-show="total > 0" />
@@ -43,17 +52,9 @@
 
         <!-- 热门文章/标签/友链 -->
         <div class="aside">
-            <el-card class="card">
-                <h3>热门文章</h3>
-                <ul class="hot-article">
-                    <li v-for="item in hot_article" @click="checkArticle(item.id)">{{ item.title }}</li>
-                </ul>
-                <el-empty v-show="hot_article.length == 0" :image-size="100" style="padding:10px 0"
-                    description="暂无文章" />
-            </el-card>
+            <Hot />
             <Friend />
         </div>
-
     </div>
 
 
@@ -65,6 +66,7 @@ import { apiArticle } from "../../api/blog"
 import { ArticleClass } from "../../type/article.type"
 import { updateQuery, skipRouter } from "../../hooks/router.hook";
 import Friend from "../friend/index.vue";
+import Hot from "../article/Hot.vue";
 
 const route = useRoute()
 
@@ -75,14 +77,6 @@ apiArticle("/getArticleClass").then((res: any) => {
     menu_list.value = res.list
     class_label.value = res.label
 })
-
-// 获取热门文章
-const hot_article = ref<any[]>([])
-apiArticle("/getHotArticleList").then((res: any) => {
-    hot_article.value = res
-})
-
-
 
 // 获取当前分类文章列表
 const article_list = ref<any[]>([])
@@ -104,7 +98,7 @@ const getArticleList = () => {
         page_size: page_size.value,
         key: key.value,
     }).then((res: any) => {
-        article_list.value = res.list.filter((v:any) => v.status == 'show')
+        article_list.value = res.list.filter((v: any) => v.status == 'show')
         total.value = res.total
         loading.value = false
     }).catch(() => {
@@ -251,14 +245,7 @@ watchEffect(async () => {
         font-weight: normal;
     }
 
-    .hot-article {
-        font-size: 14px;
-        color: #666;
 
-        li {
-            padding: 0 10px;
-        }
-    }
 
 }
 
@@ -291,6 +278,7 @@ watchEffect(async () => {
 @media screen and (max-width: 1100px) {
     .aside {
         display: none;
+        transition: all 0.5s;
     }
 }
 
