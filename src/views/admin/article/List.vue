@@ -211,6 +211,7 @@ const handleSelect = (val: any) => {
 }
 // 查看文章
 const checkArticle = (id: number) => {
+    window.sessionStorage.removeItem('route_home')
     skipRouter('detail', { id: id })
 }
 // 更改每页文章数量

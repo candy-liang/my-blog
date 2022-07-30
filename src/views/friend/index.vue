@@ -116,7 +116,6 @@ const applyFriendLink = () => {
         h4 {
             color: #409eff;
         }
-
         .avatar {
             animation: breathe 2s ease-in-out infinite;
         }
@@ -132,6 +131,7 @@ const applyFriendLink = () => {
         @include textEllipsis(1);
 
         p {
+            font-weight: normal;
             font-size: 12px;
             color: #aaa;
             @include textEllipsis(1);

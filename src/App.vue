@@ -2,6 +2,7 @@
     <el-config-provider :locale="zhCn" v-if="is_home">
         <Header />
         <div class="main">
+            <div id="top"></div>
             <router-view></router-view>
             <el-backtop target=".main" :bottom="60" :visibility-height="50">
                 <rocket-one theme="outline" size="24" title='回到顶部' />
@@ -45,6 +46,11 @@ if (!window.sessionStorage.getItem('isPoster')) {
     overflow-x: hidden;
     box-sizing: border-box;
     background-color: #fafafa;
+
+    #top {
+        position: absolute;
+        top: 0;
+    }
 }
 </style>
 <style lang="scss">
@@ -87,8 +93,6 @@ if (!window.sessionStorage.getItem('isPoster')) {
         opacity: 0;
     }
 }
-
-
 
 @keyframes tracking {
     0% {

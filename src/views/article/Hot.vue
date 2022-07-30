@@ -51,6 +51,11 @@ const checkArticle = (id: number) => {
 
         li {
             padding: 0 10px;
+
+            &:hover {
+                font-weight: bold;
+                color: #409EFF;
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="menu">
+    <div class="menu" id="menu">
         <el-card class="card">
             <el-radio-group v-model="current_class" v-show="menu_list.length" @change="changeClass">
                 <el-radio-button v-for="item in menu_list" v-show="item.count > 0" :label="item.type">
@@ -26,7 +26,7 @@
                         <h3>{{ item.title }}</h3>
                         <div class="description">
                             <div class="left">
-                                {{ item.description }}
+                                — {{ item.description }}
                             </div>
                             <div class="right">
                                 <img :src="item.poster" alt="" />
@@ -65,6 +65,7 @@ import { ApplicationTwo, PreviewOpen, Calendar } from "@icon-park/vue-next"
 import { apiArticle } from "../../api/blog"
 import { ArticleClass } from "../../type/article.type"
 import { updateQuery, skipRouter } from "../../hooks/router.hook";
+import { goAnchor } from "../../hooks/goAnchor.hook";
 import Friend from "../friend/index.vue";
 import Hot from "../article/Hot.vue";
 
@@ -118,6 +119,7 @@ const sizeChange = (val: number) => {
 const currentChange = (val: number) => {
     current_page.value = val
     updateQuery(route, { current_page: val })
+    goAnchor()
     getArticleList()
 }
 // 更改分类
@@ -129,6 +131,7 @@ const changeClass = () => {
 
 // 查看文章
 const checkArticle = (id: number) => {
+    window.sessionStorage.setItem('route_home', JSON.stringify(route.query))
     skipRouter('detail', { id })
 }
 
@@ -182,9 +185,11 @@ watchEffect(async () => {
         cursor: pointer;
 
         &:hover {
-            // transform: scale(1.01);
-            // transition: all 0.3s linear;
             animation: breathe 2s ease-in-out infinite;
+
+            h3 {
+                color: #409EFF;
+            }
         }
 
         .description {
