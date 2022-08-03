@@ -41,7 +41,7 @@
                 <el-input v-model="new_friendLink.link" />
             </el-form-item>
             <el-form-item label="简介描述">
-                <el-input v-model="new_friendLink.introduction" autosize type="textarea" />
+                <el-input v-model="new_friendLink.introduction" :autosize="{ minRows: 2 }" type="textarea" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -116,6 +116,7 @@ const applyFriendLink = () => {
         h4 {
             color: #409eff;
         }
+
         .avatar {
             animation: breathe 2s ease-in-out infinite;
         }

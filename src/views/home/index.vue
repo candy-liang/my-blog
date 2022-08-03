@@ -265,7 +265,7 @@ watchEffect(async () => {
 
     50% {
         transform: scale(1.03);
-        box-shadow: 0px 0px 12px rgba(64, 158, 255, 0.5);
+        box-shadow: inset 0px 0px 8px rgba(64, 158, 255, 0.5);
     }
 
     100% {

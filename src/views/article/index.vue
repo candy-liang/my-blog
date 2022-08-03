@@ -153,15 +153,15 @@ MdEditor.config({
 const saveHtml = (h: string) => {
     htmltext.value = h
 }
-const goBack = () => {
+const goBack = async () => {
     const query = window.sessionStorage.getItem('route_home') || '{}'
-    skipRouter('blog', JSON.parse(query))
+    await skipRouter('blog', JSON.parse(query))
 }
 // 查看文章
-const nearArticle = (art_id: number) => {
-    updateQuery(route, { id: art_id })
+const nearArticle = async (art_id: number) => {
+    await updateQuery(route, { id: art_id })
     id.value = art_id
-    getDetail()
+    await getDetail()
     goAnchor()
 }
 
@@ -178,7 +178,7 @@ const nearArticle = (art_id: number) => {
     .next {
 
         display: flex;
-        padding: 10px;
+        padding: 12px;
         align-items: center;
         cursor: pointer;
         border-radius: 10px;
@@ -188,7 +188,7 @@ const nearArticle = (art_id: number) => {
         &:hover {
             color: #409EFF;
             background-color: #fff;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
+            box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.12);
         }
 
         .title {
@@ -325,19 +325,23 @@ const nearArticle = (art_id: number) => {
             position: -webkit-sticky;
             position: sticky;
             top: 0;
+            border: none;
         }
+
+
 
         ul {
             max-height: 60vh;
-            overflow-y: auto;
+            overflow-y: overlay;
             overflow-x: hidden;
         }
 
         li {
+            padding: 0 6px;
+
             &:hover {
                 color: #409EFF;
                 transform: scale(1.03);
-                padding: 0 6px;
                 border-radius: 10px;
             }
         }
@@ -353,6 +357,7 @@ const nearArticle = (art_id: number) => {
     }
 
     .aside3 {
+
         width: 280px;
         transform: translateX(0);
         margin-left: 20px;

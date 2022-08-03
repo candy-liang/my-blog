@@ -1,5 +1,5 @@
 <template>
-    <div class="footer">Footer</div>
+    <div class="footer">粤ICP备2022095572</div>
 </template>
 
 <script setup lang="ts">
@@ -18,9 +18,9 @@ const props = defineProps({
     line-height: 50px;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.8);
-    color: #333;
+    color: #666;
     position: absolute;
     bottom: 0;
+    box-shadow: inset 0 1px 4px rgb(0 0 0 / 12%);
 }
-
 </style>

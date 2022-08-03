@@ -17,8 +17,10 @@
 
 <style lang="scss" scoped>
 .card {
+
     width: 600px;
     margin: 0 auto;
+    box-shadow: inset -2px -2px 8px rgba(0, 0, 0, 0.12);
 }
 
 h3 {

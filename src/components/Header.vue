@@ -41,10 +41,10 @@ const menu = reactive([
         label: '留言',
         path: 'message'
     },
-    {
-        label: '管理',
-        path: 'admin'
-    },
+    // {
+    //     label: '管理',
+    //     path: 'admin'
+    // },
 ])
 // 处理搜索
 const searchArticle = () => {
@@ -70,7 +70,7 @@ const searchArticle = () => {
     font-size: 16px;
     background-color: rgba(255, 255, 255, 0.8);
     color: #333;
-    box-shadow: 0 0 3px rgb(234 234 234 / 80%);
+    box-shadow: inset 0 -1px 4px rgb(0 0 0 / 12%);
     border-bottom: 1px solid rgb(234 234 234 / 80%);
     display: flex;
     padding: 0 20px;

@@ -8,7 +8,7 @@
                 <rocket-one theme="outline" size="24" title='回到顶部' />
             </el-backtop>
         </div>
-        <!-- <Footer /> -->
+        <Footer />
     </el-config-provider>
     <div class="enter-poster" v-if="is_poster">
         <p>欢 迎 来 到 candy 的 博 客</p>
