@@ -169,7 +169,8 @@ const getTableData = () => {
         type: cur_class.value,
         current_page: current_page.value,
         page_size: page_size.value,
-        key: search_val.value
+        key: search_val.value,
+        isAll:true,
     }).then((res: any) => {
         table_data.value = res.list
         total.value = res.total

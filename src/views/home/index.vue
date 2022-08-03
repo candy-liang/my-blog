@@ -91,15 +91,15 @@ current_class.value = route.query.current_class as string || 'all'
 current_page.value = Number(route.query.current_page as string) || 1
 page_size.value = Number(route.query.page_size as string) || 5
 
-const getArticleList = () => {
+const getArticleList = async () => {
     loading.value = true
-    apiArticle("/getArticleList", {
+    await apiArticle("/getArticleList", {
         type: current_class.value,
         current_page: current_page.value,
         page_size: page_size.value,
         key: key.value,
     }).then((res: any) => {
-        article_list.value = res.list.filter((v: any) => v.status == 'show')
+        article_list.value = res.list
         total.value = res.total
         loading.value = false
     }).catch(() => {
@@ -109,23 +109,23 @@ const getArticleList = () => {
 getArticleList()
 
 // 更改每页文章数量
-const sizeChange = (val: number) => {
+const sizeChange = async (val: number) => {
     current_page.value = 1
     page_size.value = val
-    updateQuery(route, { page_size: val, current_page: 1 })
-    getArticleList()
+    await updateQuery(route, { page_size: val, current_page: 1 })
+    await getArticleList()
 }
 // 更改当前页
-const currentChange = (val: number) => {
+const currentChange = async (val: number) => {
     current_page.value = val
-    updateQuery(route, { current_page: val })
-    goAnchor()
-    getArticleList()
+    await updateQuery(route, { current_page: val })
+    await goAnchor()
+    await getArticleList()
 }
 // 更改分类
-const changeClass = () => {
-    updateQuery(route, { current_class: current_class.value })
-    getArticleList()
+const changeClass = async () => {
+    await updateQuery(route, { current_class: current_class.value })
+    await getArticleList()
 }
 
 

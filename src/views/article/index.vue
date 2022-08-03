@@ -48,8 +48,9 @@
                     <menu-fold-one @click="foldCatalog" title='收起目录' />
                 </h3>
                 <ul>
-                    <li v-for="item in catalogList" :class="'title' + item.level" @click="goAnchor(item.text)"
-                        :title="item.text">
+                    <li v-for="item in catalogList"
+                        :class="`title${item.level} ${cur_catalog == item.text ? 'active' : ''}`"
+                        @click="goAnchor(item.text)" :title="item.text">
                         {{ item.text }}
                     </li>
                 </ul>
@@ -75,7 +76,7 @@ import { apiArticle } from "../../api/blog";
 import { Back, MenuFoldOne } from '@icon-park/vue-next';
 import { updateQuery, skipRouter } from "../../hooks/router.hook";
 import { goAnchor } from "../../hooks/goAnchor.hook";
-const router = useRouter()
+
 const route = useRoute()
 const is_admin = window.localStorage.getItem('admin_psw') == 'liangyaokang';
 
@@ -118,7 +119,6 @@ const getDetail = () => {
         pre_article.value = data.pre_article
         next_article.value = data.next_article
         loading.value = false
-
     }).catch(() => {
         loading.value = false
     })
@@ -164,6 +164,51 @@ const nearArticle = async (art_id: number) => {
     await getDetail()
     goAnchor()
 }
+
+onMounted(() => {
+    // 监听滚动条位置
+    window.addEventListener('scroll', scrollTop, true)
+})
+const getAllScroll = (scroll: number | undefined) => {
+    if (!scroll || scroll < 167) {
+        return catalogList.value[0]?.text || ''
+    }
+    const arr: any = catalogList.value.map((v: any) => {
+        return {
+            text: v.text,
+            offsetTop: document.getElementById(v.text)?.offsetTop
+        }
+    });
+    for (let i = 0; i < arr.length - 1; i++) {
+        const v = arr[i];
+        const v2 = arr[i + 1];
+        console.log(v.offsetTop, v2.offsetTop);
+        if (scroll <= v.offsetTop || scroll < v2.offsetTop - 50) {
+            return v.text
+        } else if (scroll <= v2.offsetTop) {
+            return v2.text
+        }
+    }
+}
+
+// 实时滚动条高度
+const scroll = ref<number>()
+const cur_catalog = ref<any>('')
+const scrollTop = () => {
+    scroll.value = document.getElementsByClassName('main')[0]?.scrollTop;
+}
+
+const antiShake = (val: number | undefined, time: number) => {
+    return setTimeout(() => {
+        cur_catalog.value = getAllScroll(val)
+        console.log('watchEffect', val)
+    }, time);
+}
+watchEffect((onInvalidate) => {
+    const timer = antiShake(scroll.value, 200)
+    onInvalidate(() => clearTimeout(timer))
+})
+
 
 </script>
               
@@ -278,6 +323,12 @@ const nearArticle = async (art_id: number) => {
     text-indent: 1em;
     font-size: 12px;
     @include textEllipsis(1);
+}
+
+.active {
+    color: #409EFF;
+    transform: scale(1.03);
+    border-radius: 10px;
 }
 
 .header {

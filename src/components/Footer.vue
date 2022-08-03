@@ -21,6 +21,7 @@ const props = defineProps({
     color: #666;
     position: absolute;
     bottom: 0;
+    font-size: 12px;
     box-shadow: inset 0 1px 4px rgb(0 0 0 / 12%);
 }
 </style>
