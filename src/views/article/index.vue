@@ -48,8 +48,8 @@
                     <menu-fold-one @click="foldCatalog" title='收起目录' />
                 </h3>
                 <ul>
-                    <li v-for="item in catalogList"
-                        :class="`title${item.level} ${cur_catalog == item.text ? 'active' : ''}`"
+                    <li v-for="(item, index) in catalogList"
+                        :class="`title${item.level} ${cur_catalog == index ? 'active' : ''}`"
                         @click="goAnchor(item.text)" :title="item.text">
                         {{ item.text }}
                     </li>
@@ -166,49 +166,33 @@ const nearArticle = async (art_id: number) => {
 }
 
 onMounted(() => {
-    // 监听滚动条位置
-    window.addEventListener('scroll', scrollTop, true)
+    window.addEventListener('scroll', onScroll, true) // 监听滚动条位置
 })
-const getAllScroll = (scroll: number | undefined) => {
-    if (!scroll || scroll < 167) {
-        return catalogList.value[0]?.text || ''
-    }
-    const arr: any = catalogList.value.map((v: any) => {
-        return {
-            text: v.text,
-            offsetTop: document.getElementById(v.text)?.offsetTop
-        }
+onUnmounted(() => {
+    window.removeEventListener('scroll', onScroll) // 清除监听
+})
+const cur_catalog = ref<number>(0)
+// 滚动监听器
+const onScroll = () => {
+    // 所有锚点元素的 offsetTop
+    const offsetTopArr: any = [];
+    catalogList.value.forEach((v: any) => {
+        offsetTopArr.push(document.getElementById(v.text)?.offsetTop);
     });
-    for (let i = 0; i < arr.length - 1; i++) {
-        const v = arr[i];
-        const v2 = arr[i + 1];
-        console.log(v.offsetTop, v2.offsetTop);
-        if (scroll <= v.offsetTop || scroll < v2.offsetTop - 50) {
-            return v.text
-        } else if (scroll <= v2.offsetTop) {
-            return v2.text
+    // 获取当前文档流的 scrollTop
+    const scrollTop = document.getElementsByClassName('main')[0]?.scrollTop
+
+    // 定义当前点亮的导航下标
+    let navIndex = 0;
+    for (let n = 0; n < offsetTopArr.length; n++) {
+        // 如果 scrollTop 大于等于第n个元素的 offsetTop 则说明 n-1 的内容已经完全不可见
+        // 那么此时导航索引就应该是n了
+        if (scrollTop >= offsetTopArr[n] - 80) {
+            navIndex = n;
         }
     }
+    cur_catalog.value = navIndex
 }
-
-// 实时滚动条高度
-const scroll = ref<number>()
-const cur_catalog = ref<any>('')
-const scrollTop = () => {
-    scroll.value = document.getElementsByClassName('main')[0]?.scrollTop;
-}
-
-const antiShake = (val: number | undefined, time: number) => {
-    return setTimeout(() => {
-        cur_catalog.value = getAllScroll(val)
-        console.log('watchEffect', val)
-    }, time);
-}
-watchEffect((onInvalidate) => {
-    const timer = antiShake(scroll.value, 200)
-    onInvalidate(() => clearTimeout(timer))
-})
-
 
 </script>
               
@@ -325,11 +309,7 @@ watchEffect((onInvalidate) => {
     @include textEllipsis(1);
 }
 
-.active {
-    color: #409EFF;
-    transform: scale(1.03);
-    border-radius: 10px;
-}
+
 
 .header {
     text-align: center;
@@ -389,10 +369,10 @@ watchEffect((onInvalidate) => {
 
         li {
             padding: 0 6px;
+            margin: 2px 0;
 
             &:hover {
                 color: #409EFF;
-                transform: scale(1.03);
                 border-radius: 10px;
             }
         }
@@ -414,5 +394,11 @@ watchEffect((onInvalidate) => {
         margin-left: 20px;
     }
 
+    .active {
+        color: #409EFF;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        box-shadow: inset 0 0px 2px rgb(0 0 0 / 12%);
+    }
 }
 </style>

@@ -109,16 +109,22 @@ const applyFriendLink = () => {
 
 .friend-link {
     display: flex;
-    margin-bottom: 15px;
     cursor: pointer;
+    border: 1px solid #fff;
+    padding: 10px;
+    border-radius: 8px;
 
     &:hover {
+        border: 1px solid #eee;
+        box-shadow: inset 0 0px 4px rgb(0 0 0 / 12%);
+
         h4 {
             color: #409eff;
         }
 
         .avatar {
-            animation: breathe 2s ease-in-out infinite;
+            transform: scale(1.1);
+            transition: all 0.5s;
         }
     }
 
@@ -142,22 +148,5 @@ const applyFriendLink = () => {
 
 .ml10 {
     margin-left: 10px;
-}
-
-@keyframes breathe {
-    0% {
-        transform: scale(1);
-        opacity: .9;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: .9;
-    }
 }
 </style>

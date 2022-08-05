@@ -18,6 +18,15 @@
             </el-tabs>
         </div>
     </el-card>
+    <el-dialog v-model="admin_dialog" title="管理员登录" :close-on-click-modal="false" :close-on-press-escape="false"
+        :show-close="false" width="500px" center>
+        <el-input v-model="password" @keyup.enter.native="login" placeholder="请输入管理员密码" />
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button type="primary" @click="login">登录</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
               
               
@@ -31,24 +40,23 @@ import { skipRouter } from "../../hooks/router.hook";
 const route = useRoute()
 // 检测是否有权限
 const is_admin = window.localStorage.getItem('admin_psw') == 'liangyaokang';
-const testAdmin = () => {
-    ElMessageBox.prompt('请输入管理员密码', '提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '返回首页',
-        inputPattern: /liangyaokang/,
-        inputErrorMessage: '密码错误',
-    }).then(() => {
-        window.localStorage.setItem('admin_psw', 'liangyaokang');
-        ElMessage.success('登录成功,即将刷新')
-        setTimeout(() => {
-            location.reload()
-        }, 1000);
-    }).catch(() => {
-        skipRouter('blog')
-    })
-}
+const admin_dialog = ref(false)
+const password = ref('')
+
 if (!is_admin) {
-    testAdmin()
+    admin_dialog.value = true
+}
+const login = () => {
+    if (password.value != 'liangyaokang') {
+        ElMessage.error('密码错误')
+        return
+    }
+    window.localStorage.setItem('admin_psw', 'liangyaokang');
+    ElMessage.success('登录成功,即将刷新')
+    admin_dialog.value = false
+    setTimeout(() => {
+        location.reload()
+    }, 1000);
 }
 
 const active_name = ref('class')
@@ -65,7 +73,6 @@ const handleClick = async (tab: TabsPaneContext) => {
               
 <style lang="scss" scoped>
 .admin {
-
     :deep(.el-tabs__header) {
         margin-right: 20px;
     }

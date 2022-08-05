@@ -185,7 +185,8 @@ watchEffect(async () => {
         cursor: pointer;
 
         &:hover {
-            animation: breathe 2s ease-in-out infinite;
+            box-shadow: inset 0px 0px 8px rgba(64, 158, 255, 0.5);
+            transition: all 0.5s;
 
             h3 {
                 color: #409EFF;
@@ -249,29 +250,13 @@ watchEffect(async () => {
     h3 {
         font-weight: normal;
     }
-
-
-
 }
 
 .ml10 {
     margin-left: 10px;
 }
 
-@keyframes breathe {
-    0% {
-        transform: scale(1);
-    }
 
-    50% {
-        transform: scale(1.03);
-        box-shadow: inset 0px 0px 8px rgba(64, 158, 255, 0.5);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
 
 @media screen and (max-width: 1366px) {
     .aside {

@@ -94,6 +94,7 @@ import { apiArticle } from "../../../api/blog";
 import { ArticleClass } from "../../../type/article.type"
 import { Search } from '@element-plus/icons-vue'
 import { updateQuery, skipRouter } from "../../../hooks/router.hook";
+import { ElMessageBox } from 'element-plus'
 const route = useRoute()
 const dialog_type = ref('')
 const cur_id = ref(0)

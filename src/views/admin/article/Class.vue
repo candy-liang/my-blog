@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import { apiArticle } from "../../../api/blog";
 import { ArticleClass } from "../../../type/article.type"
+import { ElMessageBox } from 'element-plus'
 const loading = ref(false)
 const add_class_dialog = ref(false)
 const router = useRouter()

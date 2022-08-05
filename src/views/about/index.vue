@@ -2,7 +2,7 @@
     <div class="about">
         <el-card class="card">
             <h3>
-                <el-avatar :size="70" src="../../assets/avatar.jpg" />
+                <el-avatar :size="70" src="src/assets/avatar.jpg" />
             </h3>
             <h3>关于博主</h3>
             <p class="slogan">一名在广州漂泊的前端小白，喜欢学习技术和粤语文化</p>
